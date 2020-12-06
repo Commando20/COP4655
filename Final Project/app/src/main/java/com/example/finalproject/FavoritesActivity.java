@@ -29,7 +29,7 @@ public class FavoritesActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_favorites);
 
         final TextView textView = findViewById(R.id.yelp);
         textView.setText("333333333333333333333333333333");
