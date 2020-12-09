@@ -48,8 +48,8 @@ public class FavoritesActivity extends AppCompatActivity {
                         Intent map = new Intent(FavoritesActivity.this, ResultsActivity.class);
                         startActivity(map);
                         break;
-                    case R.id.navigation_favorites:
-                        Intent history = new Intent(FavoritesActivity.this, FavoritesActivity.class);
+                    case R.id.navigation_search:
+                        Intent history = new Intent(FavoritesActivity.this, SearchActivity.class);
                         startActivity(history);
                         break;
                 }
