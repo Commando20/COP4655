@@ -4,17 +4,15 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import org.w3c.dom.Text;
+import java.util.Objects;
 
 public class ResultsActivity extends AppCompatActivity {
-
     TextView name;
     TextView rating;
     TextView price;
@@ -38,19 +36,24 @@ public class ResultsActivity extends AppCompatActivity {
 
         name.setText(data.getName());
         rating.setText("Rating: " + data.getRating());
-
-        //String phoneNum = data.getPhoneNumber().replaceFirst("(\\d{2})(\\d{3})(\\d{3})(\\d+)", "($2) $2-$4");
-
         location.setText("Address: " + data.getAddress());
 
         String openClosed = data.getOpenClosed();
-        if(openClosed.equals("false")) {
-            openClosed = "Closed";
-        } else openClosed = "Open";
-        hours.setText("Hours: " + openClosed);
+        if (openClosed != null) {
+            if(openClosed.equals("false")) {
+                openClosed = "Open";
+            } else openClosed = "Closed";
+            hours.setText("Open/Closed: " + openClosed);
+        }
 
         phoneNumber.setText("Phone Number: " + data.getPhoneNumber());
 
+        name.setVisibility(View.VISIBLE);
+        rating.setVisibility(View.VISIBLE);
+        price.setVisibility(View.VISIBLE);
+        location.setVisibility(View.VISIBLE);
+        hours.setVisibility(View.VISIBLE);
+        phoneNumber.setVisibility(View.VISIBLE);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_results);
@@ -59,16 +62,16 @@ public class ResultsActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.navigation_home:
-                        Intent text = new Intent(ResultsActivity.this, MainActivity.class);
-                        startActivity(text);
+                        Intent home = new Intent(ResultsActivity.this, MainActivity.class);
+                        startActivity(home);
                         break;
                     case R.id.navigation_search:
-                        Intent map = new Intent(ResultsActivity.this, SearchActivity.class);
-                        startActivity(map);
+                        Intent search = new Intent(ResultsActivity.this, SearchActivity.class);
+                        startActivity(search);
                         break;
                     case R.id.navigation_favorites:
-                        Intent history = new Intent(ResultsActivity.this, FavoritesActivity.class);
-                        startActivity(history);
+                        Intent favorites = new Intent(ResultsActivity.this, FavoritesActivity.class);
+                        startActivity(favorites);
                         break;
                 }
                 return true;
