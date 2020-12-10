@@ -57,6 +57,7 @@ dependencies {
 
     //Circle profile picture dependency
     implementation 'de.hdodenhof:circleimageview:1.2.1'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

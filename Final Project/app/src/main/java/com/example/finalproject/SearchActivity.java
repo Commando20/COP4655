@@ -1,7 +1,9 @@
 package com.example.finalproject;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +19,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -34,6 +37,12 @@ import java.util.Map;
 
 public class SearchActivity extends AppCompatActivity {
 
+    private static final int REQUEST_CODE_PERMISSION = 2;
+    String mPermission = Manifest.permission.ACCESS_FINE_LOCATION;
+    GPSTracker gps; //GPSTracker class
+    double latitude;
+    double longitude;
+
     public static YelpData data = new YelpData();
     public ImageButton searchBtn;
     public ImageButton locationBtn;
@@ -48,6 +57,12 @@ public class SearchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+
+        try { //If any permission not allowed by user, this condition will execute every time
+            if (ActivityCompat.checkSelfPermission(this, mPermission) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{mPermission}, REQUEST_CODE_PERMISSION);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
 
         searchBtn = findViewById(R.id.searchbtn);
         locationBtn = findViewById(R.id.locationbtn);
@@ -89,6 +104,54 @@ public class SearchActivity extends AppCompatActivity {
                 }
             }
         });
+
+        locationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = inputName.getText().toString();
+                //Keep location input to throw alert if user has a location search and presses location button
+                String location = inputLocation.getText().toString();
+
+                gps = new GPSTracker(SearchActivity.this);
+
+                //Check if GPS enabled
+                if(gps.canGetLocation()){
+                    latitude = gps.getLatitude();
+                    longitude = gps.getLongitude();
+                }else {
+                    //can't get location
+                    //GPS or Network is not enabled
+                    //Ask user to enable GPS/network in settings
+                    gps.showSettingsAlert();
+                }
+
+                /*if (location.isEmpty() || name.isEmpty()) {
+                    // Create the object of AlertDialog Builder class
+                    AlertDialog.Builder builder = new AlertDialog.Builder(SearchActivity.this);
+                    // Set Alert Title
+                    builder.setTitle("Alert!");
+                    // Set Cancelable false for when the user clicks on the outside the Dialog Box then it will remain show
+                    builder.setCancelable(false);
+                    //Set the message show for the Alert time
+                    builder.setMessage("You must provide an input to both searches if you want to search for a business");
+                    // Set the positive button with yes name OnClickListener method is use of DialogInterface interface.
+                    builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // When the user click yes button then app will close
+                            dialog.cancel();
+                        }
+                    });
+                    //Create the Alert dialog
+                    AlertDialog alertDialog = builder.create();
+                    //Show the Alert Dialog box
+                    alertDialog.show();
+                } else {*/
+                    getYelpByTermAndGPS(name, latitude, longitude);
+                //}
+            }
+        });
+
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_search);
@@ -222,7 +285,7 @@ public class SearchActivity extends AppCompatActivity {
                             };
                             queue.add(request);*/
                             Intent intent = new Intent(SearchActivity.this, ResultsActivity.class);
-                            Toast.makeText(SearchActivity.this,"Fetching data for " + itemName, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SearchActivity.this,"Fetching data", Toast.LENGTH_SHORT).show();
                             //System.out.println(nameList.get(position));
                             startActivity(intent);
                         }
@@ -244,4 +307,134 @@ public class SearchActivity extends AppCompatActivity {
         };
         queue.add(request);
     }
+
+    public void getYelpByTermAndGPS(final String term, final double latitude, final double longitude) {
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        String URL = "https://api.yelp.com/v3/businesses/search?term=" + term + "&latitude=" + latitude + "&longitude=" + longitude;
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL , new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray yelpArray = response.getJSONArray("businesses");
+
+                    for (int i = 0; i < 8; i++) { //Loop to get results for 15 businesses
+                        JSONObject yelpObject = yelpArray.getJSONObject(i);
+                        String name = yelpObject.getString("name");
+
+                        JSONObject locationObj = yelpObject.getJSONObject("location");
+                        String address = locationObj.getString("address1");
+                        String city = locationObj.getString("city");
+                        String state = locationObj.getString("state");
+                        String zipCode = locationObj.getString("zip_code");
+
+                        String location = address + ", " + city + ", " + state + " " + zipCode;
+                        HashMap<String, String> businessList = new HashMap<>();
+                        businessList.put("name", name);
+                        businessList.put("location", location);
+                        nameList.add(businessList);
+
+                        data.setName(yelpObject.getString("name"));
+                        data.setRating(yelpObject.getString("rating") + " / 5.0 rating out of "
+                                + yelpObject.getString("review_count") + " reviews");
+                        data.setAddress(address + ", " + city + ", " + state + " " + zipCode);
+                        data.setOpenClosed(yelpObject.getString("is_closed"));
+                        data.setPhoneNumber(yelpObject.getString("display_phone"));
+
+                        JSONObject coordObj = yelpObject.getJSONObject("coordinates");
+                        data.setLat(coordObj.getString("latitude"));
+                        data.setLong(coordObj.getString("longitude"));
+
+                    }
+                    //do another search, connect to api, and find same name of business
+                    ListAdapter adapter = new SimpleAdapter(SearchActivity.this, nameList,
+                            R.layout.list_item, new String[]{"name","location"},
+                            new int[]{R.id.name, R.id.rating});
+                    //((BaseAdapter)adapter).notifyDataSetChanged();
+                    lv.setAdapter(adapter);
+
+                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                            /*RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+                            String URL = "https://api.yelp.com/v3/businesses/search?term=" + term + "&location=" + location;
+                            System.out.println(term + "   " + location);
+                            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL , new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
+                                    try {
+                                        JSONArray yelpArray = response.getJSONArray("businesses");
+                                        int total = Integer.parseInt(response.getString("total"));
+
+                                        HashMap<String, String> business = nameList.get(position);
+                                        System.out.println(business);
+                                        itemName = business.get("name");
+                                        System.out.println(itemName);
+                                        itemName = business.get("location");
+                                        System.out.println(itemLocation);
+
+                                        for (int i = 0; i < total; i++) { //Loop to get results for 20 businesses
+                                            JSONObject yelpObject = yelpArray.getJSONObject(i);
+                                            String name = yelpObject.getString("name");
+
+                                            JSONObject locationObj = yelpObject.getJSONObject("location");
+                                            String address = locationObj.getString("address1");
+                                            String city = locationObj.getString("city");
+                                            String state = locationObj.getString("state");
+                                            String zipCode = locationObj.getString("zip_code");
+                                            String location = address + ", " + city + ", " + state + " " + zipCode;
+
+                                            if (itemName.equals(name)) {
+                                                System.out.println("it appears that " + itemName + "and " + name + " are a match.");
+                                                data.setName(yelpObject.getString("name"));
+                                                data.setRating(yelpObject.getString("rating") + " / 5.0 rating out of "
+                                                        + yelpObject.getString("review_count") + " reviews");
+                                                data.setAddress(address + ", " + city + ", " + state + " " + zipCode);
+                                                data.setOpenClosed(yelpObject.getString("is_closed"));
+                                                data.setPhoneNumber(yelpObject.getString("display_phone"));
+
+                                                JSONObject coordObj = yelpObject.getJSONObject("coordinates");
+                                                data.setLat(coordObj.getString("latitude"));
+                                                data.setLong(coordObj.getString("longitude"));
+                                            }
+                                        }
+                                    } catch (JSONException e) { e.printStackTrace(); }
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    System.out.println("Volley error");
+                                }
+                            }) {
+                                @Override //This is for Headers If You Needed
+                                public Map<String,String> getHeaders() {
+                                    Map<String,String> params = new HashMap<>();
+                                    params.put("Authorization","bearer " + "IGeH9oQlcaQpbdrzxIUBCDfC6zgIC4dkRt2_LEE2W99GHrW5JKl91db_nWarHKP9RgpzfouaXn8IW3q8HEwF_o3V6tIzgghXQCWnKq5MGurm9vC7ZaJWkXD5yYyyX3Yx");
+                                    return params;
+                                }
+                            };
+                            queue.add(request);*/
+                            Intent intent = new Intent(SearchActivity.this, ResultsActivity.class);
+                            Toast.makeText(SearchActivity.this,"Fetching data", Toast.LENGTH_SHORT).show();
+                            //System.out.println(nameList.get(position));
+                            startActivity(intent);
+                        }
+                    });
+                } catch (JSONException e) { e.printStackTrace(); }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("Volley error");
+            }
+        }) {
+            @Override //This is for Headers If You Needed
+            public Map<String,String> getHeaders() {
+                Map<String,String> params = new HashMap<>();
+                params.put("Authorization","bearer " + "IGeH9oQlcaQpbdrzxIUBCDfC6zgIC4dkRt2_LEE2W99GHrW5JKl91db_nWarHKP9RgpzfouaXn8IW3q8HEwF_o3V6tIzgghXQCWnKq5MGurm9vC7ZaJWkXD5yYyyX3Yx");
+                return params;
+            }
+        };
+        queue.add(request);
+    }
+
 }

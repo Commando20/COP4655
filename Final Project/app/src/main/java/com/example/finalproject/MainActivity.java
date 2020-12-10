@@ -1,7 +1,6 @@
 package com.example.finalproject;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -13,7 +12,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -105,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
-        MenuItem favorites = bottomNavigationView.getMenu().getItem(R.id.navigation_favorites).setCheckable(false);
+       // MenuItem favorites = bottomNavigationView.getMenu().getItem(1).setCheckable(false);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -119,32 +117,8 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(results);
                         break;
                     case R.id.navigation_favorites:
-                        if (signIn()) {
-                            favorites.setCheckable(true);
-                            Intent favorites = new Intent(MainActivity.this, FavoritesActivity.class);
-                            startActivity(favorites);
-                        }else {
-                            // Create the object of AlertDialog Builder class
-                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                            // Set Alert Title
-                            builder.setTitle("Alert!");
-                            // Set Cancelable false for when the user clicks on the outside the Dialog Box then it will remain show
-                            builder.setCancelable(false);
-                            //Set the message show for the Alert time
-                            builder.setMessage("You must first sign in to be able to use this feature.");
-                            // Set the positive button with yes name OnClickListener method is use of DialogInterface interface.
-                            builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // When the user click yes button then app will close
-                                    dialog.cancel();
-                                }
-                            });
-                            //Create the Alert dialog
-                            AlertDialog alertDialog = builder.create();
-                            //Show the Alert Dialog box
-                            alertDialog.show();
-                        }
+                        Intent favorites = new Intent(MainActivity.this, FavoritesActivity.class);
+                        startActivity(favorites);
                         break;
                 }
                 return true;
@@ -152,10 +126,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public boolean signIn(){
+    public void signIn(){
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
-        return true; //Returns true (You are signed in)
     }
 
     @Override
@@ -232,4 +205,3 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
-
