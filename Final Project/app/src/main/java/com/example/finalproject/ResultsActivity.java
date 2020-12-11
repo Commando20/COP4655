@@ -1,13 +1,14 @@
 package com.example.finalproject;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
@@ -21,7 +22,7 @@ public class ResultsActivity extends AppCompatActivity {
     TextView location;
     TextView hours;
     TextView phoneNumber;
-    Button heart;
+    ToggleButton heart;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -30,13 +31,6 @@ public class ResultsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_results);
 
         heart = findViewById(R.id.heart);
-        heart.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("UseCompatLoadingForDrawables")
-            @Override
-            public void onClick(View v) {
-                heart.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart_filled));
-            }
-        });
 
         YelpData data = SearchActivity.getDataInstance();
         name = findViewById(R.id.name);
@@ -66,6 +60,25 @@ public class ResultsActivity extends AppCompatActivity {
         location.setVisibility(View.VISIBLE);
         hours.setVisibility(View.VISIBLE);
         phoneNumber.setVisibility(View.VISIBLE);
+
+        heart.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @SuppressLint("UseCompatLoadingForDrawables")
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    heart.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart_filled));
+                    @SuppressLint("ShowToast")
+                    Toast toast = Toast.makeText(ResultsActivity.this, data.getName() + " has been added to your favorites", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                } else {
+                    heart.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart));
+                    @SuppressLint("ShowToast")
+                    Toast toast = Toast.makeText(ResultsActivity.this, data.getName() + " has been removed from your favorites", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
+            }
+        });
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_results);
