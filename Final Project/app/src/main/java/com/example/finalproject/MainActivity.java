@@ -1,5 +1,6 @@
 package com.example.finalproject;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.auth.api.Auth;
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         setContentView(R.layout.activity_main);
 
         signInTip = findViewById(R.id.signInTip);
-        SignInButton signInButton;// = findViewById(R.id.signInButton);
+        SignInButton signInButton;
         Button signOutButton = findViewById(R.id.signOutButton);
         favoritesButton = findViewById(R.id.favoritesButton);
 
@@ -93,14 +95,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         });
 
-        favoritesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent favorites = new Intent(MainActivity.this, FavoritesActivity.class);
-                startActivity(favorites);
-            }
-        });
-
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -116,7 +110,27 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         startActivity(results);
                         break;
                     case R.id.navigation_favorites:
-
+                        // Create the object of AlertDialog Builder class
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        // Set Alert Title
+                        builder.setTitle("Alert!");
+                        // Set Cancelable false for when the user clicks on the outside the Dialog Box then it will remain show
+                        builder.setCancelable(false);
+                        //Set the message show for the Alert time
+                        builder.setMessage("You must first login to be able to use this feature");
+                        // Set the positive button with yes name OnClickListener method is use of DialogInterface interface.
+                        builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //When the user click yes button then app will close
+                                dialog.cancel();
+                            }
+                        });
+                        //Create the Alert dialog
+                        AlertDialog alertDialog = builder.create();
+                        //Show the Alert Dialog box
+                        alertDialog.show();
+                        bottomNavigationView.setSelectedItemId(R.id.navigation_home);
                         break;
                 }
                 return true;

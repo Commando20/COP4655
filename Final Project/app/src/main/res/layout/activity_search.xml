@@ -59,7 +59,7 @@
         android:layout_height="195dp"
         android:layout_marginStart="52dp"
         android:layout_marginTop="76dp"
-        android:text="Enter a business name and its city location or press the current location button to get results on a business."
+        android:text="Enter a business name or type and its city location or press the current location button to get results on a business."
         android:textSize="18dp"
         android:textColor="#FFFFFF"
         app:layout_constraintStart_toStartOf="parent"
@@ -130,7 +130,9 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="1.0"
+        android:divider="#C1C1C1"
+        android:dividerHeight="1dp" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"

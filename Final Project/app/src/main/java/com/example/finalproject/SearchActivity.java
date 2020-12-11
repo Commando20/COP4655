@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SearchActivity extends AppCompatActivity {
-
     private static final int REQUEST_CODE_PERMISSION = 2;
     String mPermission = Manifest.permission.ACCESS_FINE_LOCATION;
     GPSTracker gps; //GPSTracker class
@@ -47,8 +46,6 @@ public class SearchActivity extends AppCompatActivity {
     public ImageButton locationBtn;
     private EditText inputName;
     private EditText inputLocation;
-    ArrayList<HashMap<String, String>> nameList;
-    private ListView lv;
     String itemName, itemLocation;
 
     @Override
@@ -67,8 +64,6 @@ public class SearchActivity extends AppCompatActivity {
         searchBtn = findViewById(R.id.searchbtn);
         inputName = findViewById(R.id.inputName);
         inputLocation = findViewById(R.id.inputLocation);
-        nameList = new ArrayList<>();
-        lv = findViewById(R.id.list);
 
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -177,6 +172,8 @@ public class SearchActivity extends AppCompatActivity {
     public static YelpData getDataInstance() { return data; }
 
     public void getYelpByTermAndLocation (final String term, final String location) {
+        final ArrayList<HashMap<String, String>> nameList = new ArrayList<>();
+        final ListView lv = findViewById(R.id.list);
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String URL = "https://api.yelp.com/v3/businesses/search?term=" + term + "&location=" + location;
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL , new Response.Listener<JSONObject>() {
@@ -306,6 +303,8 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     public void getYelpByTermAndGPS(final String term, final double latitude, final double longitude) {
+        final ArrayList<HashMap<String, String>> nameList = new ArrayList<>();
+        final ListView lv = findViewById(R.id.list);
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String URL = "https://api.yelp.com/v3/businesses/search?term=" + term + "&latitude=" + latitude + "&longitude=" + longitude;
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL , new Response.Listener<JSONObject>() {
