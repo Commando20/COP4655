@@ -1,11 +1,15 @@
 package com.example.finalproject;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.ToggleButton;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -17,12 +21,22 @@ public class ResultsActivity extends AppCompatActivity {
     TextView location;
     TextView hours;
     TextView phoneNumber;
+    Button heart;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
+
+        heart = findViewById(R.id.heart);
+        heart.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("UseCompatLoadingForDrawables")
+            @Override
+            public void onClick(View v) {
+                heart.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart_filled));
+            }
+        });
 
         YelpData data = SearchActivity.getDataInstance();
         name = findViewById(R.id.name);
@@ -60,7 +74,7 @@ public class ResultsActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.navigation_home:
-                        Intent home = new Intent(ResultsActivity.this, MainActivity.class);
+                        Intent home = new Intent(ResultsActivity.this, ProfileActivity.class);
                         startActivity(home);
                         break;
                     case R.id.navigation_search:

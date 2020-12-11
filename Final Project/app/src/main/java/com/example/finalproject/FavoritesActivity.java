@@ -41,7 +41,7 @@ public class FavoritesActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.navigation_home:
-                        Intent text = new Intent(FavoritesActivity.this, MainActivity.class);
+                        Intent text = new Intent(FavoritesActivity.this, ProfileActivity.class);
                         startActivity(text);
                         break;
                     case R.id.navigation_results:

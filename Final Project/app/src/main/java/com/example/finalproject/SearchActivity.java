@@ -30,7 +30,6 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +49,6 @@ public class SearchActivity extends AppCompatActivity {
     private EditText inputLocation;
     ArrayList<HashMap<String, String>> nameList;
     private ListView lv;
-
     String itemName, itemLocation;
 
     @Override
@@ -152,7 +150,6 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
-
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_search);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -160,7 +157,7 @@ public class SearchActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.navigation_home:
-                        Intent home = new Intent(SearchActivity.this, MainActivity.class);
+                        Intent home = new Intent(SearchActivity.this, ProfileActivity.class);
                         startActivity(home);
                         break;
                     case R.id.navigation_favorites:
@@ -436,5 +433,4 @@ public class SearchActivity extends AppCompatActivity {
         };
         queue.add(request);
     }
-
 }
