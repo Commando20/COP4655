@@ -24,6 +24,8 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.Objects;
+
 public class ProfileActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     Button signOutButton;
     Button favoritesButton;
@@ -35,6 +37,8 @@ public class ProfileActivity extends AppCompatActivity implements GoogleApiClien
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        Objects.requireNonNull(getSupportActionBar()).hide(); //Get rid of pesky titlebar
+        MainActivity.signIn = 1;
 
         signOutButton = findViewById(R.id.signOutButton);
         favoritesButton = findViewById(R.id.favoritesButton);
@@ -50,6 +54,7 @@ public class ProfileActivity extends AppCompatActivity implements GoogleApiClien
         signOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                MainActivity.signIn = 0;
                 FirebaseAuth.getInstance().signOut();
                 Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(new ResultCallback<Status>() {
                     @Override

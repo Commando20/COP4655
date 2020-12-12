@@ -15,7 +15,6 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -28,14 +27,17 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class SearchActivity extends AppCompatActivity {
+
     private static final int REQUEST_CODE_PERMISSION = 2;
     String mPermission = Manifest.permission.ACCESS_FINE_LOCATION;
     GPSTracker gps; //GPSTracker class
@@ -51,6 +53,7 @@ public class SearchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+        Objects.requireNonNull(getSupportActionBar()).hide(); //Get rid of pesky titlebar
 
         try { //If any permission not allowed by user, this condition will execute every time
             if (ActivityCompat.checkSelfPermission(this, mPermission) != PackageManager.PERMISSION_GRANTED) {
@@ -150,16 +153,44 @@ public class SearchActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.navigation_home:
-                        Intent home = new Intent(SearchActivity.this, ProfileActivity.class);
-                        startActivity(home);
-                        break;
-                    case R.id.navigation_favorites:
-                        Intent favorites = new Intent(SearchActivity.this, FavoritesActivity.class);
-                        startActivity(favorites);
+                        if (MainActivity.signIn == 0) {
+                            Intent home = new Intent(SearchActivity.this, MainActivity.class);
+                            startActivity(home);
+                        } else {
+                            Intent home = new Intent(SearchActivity.this, ProfileActivity.class);
+                            startActivity(home);
+                        }
                         break;
                     case R.id.navigation_results:
                         Intent results = new Intent(SearchActivity.this, ResultsActivity.class);
                         startActivity(results);
+                        break;
+                    case R.id.navigation_favorites:
+                        if (MainActivity.signIn == 0) {
+                            // Create the object of AlertDialog Builder class
+                            AlertDialog.Builder builder = new AlertDialog.Builder(SearchActivity.this);
+                            // Set Alert Title
+                            builder.setTitle("Alert!");
+                            // Set Cancelable false for when the user clicks on the outside the Dialog Box then it will remain show
+                            builder.setCancelable(false);
+                            //Set the message show for the Alert time
+                            builder.setMessage("You must first login to be able to use this feature");
+                            // Set the positive button with yes name OnClickListener method is use of DialogInterface interface.
+                            builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    //When the user click yes button then app will close
+                                    dialog.cancel();
+                                }
+                            });
+                            //Create the Alert dialog
+                            AlertDialog alertDialog = builder.create();
+                            //Show the Alert Dialog box
+                            alertDialog.show();
+                        } else {
+                            Intent favorites = new Intent(SearchActivity.this, FavoritesActivity.class);
+                            startActivity(favorites);
+                        }
                         break;
                 }
                 return true;
@@ -210,7 +241,6 @@ public class SearchActivity extends AppCompatActivity {
                                 + yelpObject.getString("review_count") + " reviews");
                         Log.d("RESULT", yelpObject.getString("is_closed"));
                         Log.d("RESULT", yelpObject.getString("display_phone"));
-                        Log.d("RESULT", name);
                     }
                     //do another search, connect to api, and find same name of business
                     ListAdapter adapter = new SimpleAdapter(SearchActivity.this, nameList,
@@ -223,8 +253,8 @@ public class SearchActivity extends AppCompatActivity {
                         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                             HashMap<String, String> business = nameList.get(position);
                             data.setName(business.get("name"));
-                            data.setAddress(business.get("rating"));
-                            data.setRating(business.get("location"));
+                            data.setRating(business.get("rating"));
+                            data.setAddress(business.get("location"));
                             data.setOpenClosed(business.get("openClosed"));
                             data.setPhoneNumber(business.get("phoneNumber"));
                             data.setLat(business.get("latitude"));
@@ -275,8 +305,8 @@ public class SearchActivity extends AppCompatActivity {
                         String city = locationObj.getString("city");
                         String state = locationObj.getString("state");
                         String zipCode = locationObj.getString("zip_code");
-
                         String location = address + ", " + city + ", " + state + " " + zipCode;
+
                         HashMap<String, String> businessList = new HashMap<>();
                         businessList.put("name", name);
                         businessList.put("location", location);
@@ -294,7 +324,6 @@ public class SearchActivity extends AppCompatActivity {
                                 + yelpObject.getString("review_count") + " reviews");
                         Log.d("RESULT", yelpObject.getString("is_closed"));
                         Log.d("RESULT", yelpObject.getString("display_phone"));
-                        Log.d("RESULT", name);
                     }
 
                     ListAdapter adapter = new SimpleAdapter(SearchActivity.this, nameList,
@@ -307,8 +336,8 @@ public class SearchActivity extends AppCompatActivity {
                         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                             HashMap<String, String> business = nameList.get(position);
                             data.setName(business.get("name"));
-                            data.setAddress(business.get("rating"));
-                            data.setRating(business.get("location"));
+                            data.setRating(business.get("rating"));
+                            data.setAddress(business.get("location"));
                             data.setOpenClosed(business.get("openClosed"));
                             data.setPhoneNumber(business.get("phoneNumber"));
                             data.setLat(business.get("latitude"));

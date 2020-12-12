@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
     String name, email, idToken;
+    public static int signIn = 0;
 
     TextView signInTip;
     TextView welcome;
@@ -51,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Objects.requireNonNull(getSupportActionBar()).hide(); //Get rid of pesky titlebar
+
 
         signInTip = findViewById(R.id.signInTip);
         SignInButton signInButton;
@@ -130,7 +133,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         AlertDialog alertDialog = builder.create();
                         //Show the Alert Dialog box
                         alertDialog.show();
-                        bottomNavigationView.setSelectedItemId(R.id.navigation_home);
                         break;
                 }
                 return true;

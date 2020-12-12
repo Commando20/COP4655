@@ -54,10 +54,24 @@
         tools:ignore="ContentDescription" />
 
     <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="68dp"
+        android:text="Business Search"
+        android:textColor="#FFFFFF"
+        android:textSize="40dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.513"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText,SpUsage" />
+
+    <TextView
         android:id="@+id/welcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="140dp"
+        android:layout_marginTop="160dp"
         android:text="Welcome"
         android:textColor="#FFFFFF"
         android:textSize="34dp"

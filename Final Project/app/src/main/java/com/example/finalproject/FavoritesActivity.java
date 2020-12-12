@@ -3,26 +3,13 @@ package com.example.finalproject;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 public class FavoritesActivity extends AppCompatActivity {
 
@@ -30,9 +17,8 @@ public class FavoritesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorites);
+        Objects.requireNonNull(getSupportActionBar()).hide(); //Get rid of pesky titlebar
 
-        final TextView textView = findViewById(R.id.yelp);
-        textView.setText("333333333333333333333333333333");
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_favorites);

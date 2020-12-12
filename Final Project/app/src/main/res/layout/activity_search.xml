@@ -54,14 +54,29 @@
         tools:ignore="ContentDescription" />
 
     <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="68dp"
+        android:text="Business Search"
+        android:textColor="#FFFFFF"
+        android:textSize="40dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText,SpUsage" />
+
+    <TextView
         android:id="@+id/textView4"
         android:layout_width="307dp"
         android:layout_height="195dp"
         android:layout_marginStart="52dp"
-        android:layout_marginTop="76dp"
+        android:layout_marginTop="128dp"
         android:text="Enter a business name or type and its city location or press the current location button to get results on a business."
-        android:textSize="18dp"
+        android:textAlignment="center"
         android:textColor="#FFFFFF"
+        android:textSize="18dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="HardcodedText,SpUsage" />
@@ -70,50 +85,50 @@
         android:id="@+id/inputName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="172dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="232dp"
         android:ems="10"
-        android:hint="Input a business"
+        android:hint="Enter a business"
         android:inputType="textPersonName"
         android:textColor="#FFFFFF"
-        android:textColorHint="#FFFFFF"
+        android:textColorHint="#C1C1C1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="Autofill,HardcodedText" />
-
-    <EditText
-        android:id="@+id/inputLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="4dp"
-        android:ems="10"
-        android:hint="Input a location or press the location button"
-        android:inputType="textPersonName"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#FFFFFF"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/inputName"
         tools:ignore="Autofill,HardcodedText" />
 
     <ImageButton
         android:id="@+id/searchbtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="208dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="268dp"
         app:layout_constraintStart_toEndOf="@+id/inputName"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_search"
         tools:ignore="ContentDescription" />
 
+    <EditText
+        android:id="@+id/inputLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="12dp"
+        android:ems="10"
+        android:hint="Enter a location"
+        android:inputType="textPersonName"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#C1C1C1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/inputName"
+        tools:ignore="Autofill,HardcodedText" />
+
     <ImageButton
         android:id="@+id/locationbtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="208dp"
+        android:layout_marginTop="268dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.045"
         app:layout_constraintStart_toEndOf="@+id/searchbtn"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_location"
@@ -122,7 +137,9 @@
     <ListView
         android:id="@+id/list"
         android:layout_width="wrap_content"
-        android:layout_height="344dp"
+        android:layout_height="320dp"
+        android:divider="#C1C1C1"
+        android:dividerHeight="1dp"
         android:focusableInTouchMode="false"
         android:isScrollContainer="false"
         app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
@@ -130,9 +147,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
-        android:divider="#C1C1C1"
-        android:dividerHeight="1dp" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
