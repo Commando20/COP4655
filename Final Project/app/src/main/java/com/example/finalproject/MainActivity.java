@@ -33,7 +33,6 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
-    private static final String TAG = "MainActivity";
     private GoogleApiClient googleApiClient;
     private static final int RC_SIGN_IN = 1;
     private FirebaseAuth firebaseAuth;
@@ -71,18 +70,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 //if user is signed in, we call a helper method to save the user details to Firebase
                 if (user != null) {
                     // User is signed in
-                    // you could place other firebase code
-                    //logic to save the user details to Firebase
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    // you could place other firebase code logic to save the user details to Firebase
+                    Log.d("MainActivity", "onAuthStateChanged:signed_in:" + user.getUid());
                 } else {
                     // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
+                    Log.d("MainActivity", "onAuthStateChanged:signed_out");
                 }
             }
         };
 
         GoogleSignInOptions gso =  new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))//you can also use R.string.default_web_client_id
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail().build();
 
         googleApiClient=new GoogleApiClient.Builder(this).enableAutoManage(this, this)
@@ -165,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             firebaseAuthWithGoogle(credential);
         }else{
             // Google Sign In failed, update UI appropriately
-            Log.e(TAG, "Login Unsuccessful. "+result);
+            Log.e("MainActivity", "Login Unsuccessful. "+result);
             Toast.makeText(this, "Login Unsuccessful", Toast.LENGTH_SHORT).show();
         }
     }
@@ -174,12 +172,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
+                Log.d("MainActivity", "signInWithCredential:onComplete:" + task.isSuccessful());
                 if (task.isSuccessful()) {
                     Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
                     gotoProfile();
                 } else {
-                    Log.w(TAG, "signInWithCredential" + Objects.requireNonNull(task.getException()).getMessage());
+                    Log.w("MainActivity", "signInWithCredential" + Objects.requireNonNull(task.getException()).getMessage());
                     task.getException().printStackTrace();
                     Toast.makeText(MainActivity.this, "Authentication failed.",
                             Toast.LENGTH_SHORT).show();

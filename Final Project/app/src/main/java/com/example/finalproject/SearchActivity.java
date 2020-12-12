@@ -242,10 +242,9 @@ public class SearchActivity extends AppCompatActivity {
                         Log.d("RESULT", yelpObject.getString("is_closed"));
                         Log.d("RESULT", yelpObject.getString("display_phone"));
                     }
-                    //do another search, connect to api, and find same name of business
                     ListAdapter adapter = new SimpleAdapter(SearchActivity.this, nameList,
                             R.layout.list_item, new String[]{"name","location"},
-                            new int[]{R.id.name, R.id.rating});
+                            new int[]{R.id.name, R.id.location});
                     lv.setAdapter(adapter);
 
                     lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -328,7 +327,7 @@ public class SearchActivity extends AppCompatActivity {
 
                     ListAdapter adapter = new SimpleAdapter(SearchActivity.this, nameList,
                             R.layout.list_item, new String[]{"name","location"},
-                            new int[]{R.id.name, R.id.rating});
+                            new int[]{R.id.name, R.id.location});
                     lv.setAdapter(adapter);
 
                     lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {

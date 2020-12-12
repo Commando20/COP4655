@@ -1,10 +1,10 @@
 package com.example.finalproject;
 
 import android.annotation.SuppressLint;
-import android.app.MediaRouteButton;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,27 +12,32 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
-@SuppressLint("StaticFieldLeak")
 public class ResultsActivity extends AppCompatActivity {
-    public static TextView name;
-    public static TextView rating;
-    public static TextView location;
-    public static TextView hours;
-    public static TextView phoneNumber;
-    public static ToggleButton star;
-    public static Fragment map;
+
+    TextView name;
+    TextView rating;
+    TextView location;
+    TextView hours;
+    TextView phoneNumber;
+    ToggleButton star;
+    YelpData data = SearchActivity.getDataInstance();
+    String openClosed;
+    public static String businessName;
+    private DocumentReference docRef;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -43,18 +48,24 @@ public class ResultsActivity extends AppCompatActivity {
 
         star = findViewById(R.id.star);
 
-        YelpData data = SearchActivity.getDataInstance();
         name = findViewById(R.id.name);
         rating = findViewById(R.id.rating);
         location = findViewById(R.id.location);
         hours = findViewById(R.id.hours);
         phoneNumber = findViewById(R.id.phoneNumber);
 
-        name.setText(data.getName());
+        name.setVisibility(View.VISIBLE);
+        rating.setVisibility(View.VISIBLE);
+        location.setVisibility(View.VISIBLE);
+        hours.setVisibility(View.VISIBLE);
+        phoneNumber.setVisibility(View.VISIBLE);
+
+        businessName = data.getName();
+        name.setText(businessName);
         rating.setText("Rating: " + data.getRating());
         location.setText("Address: " + data.getAddress());
 
-        String openClosed = data.getOpenClosed();
+        openClosed = data.getOpenClosed();
         if (openClosed != null) {
             if(openClosed.equals("false")) {
                 openClosed = "Open";
@@ -64,24 +75,39 @@ public class ResultsActivity extends AppCompatActivity {
 
         phoneNumber.setText("Phone Number: " + data.getPhoneNumber());
 
-        name.setVisibility(View.VISIBLE);
-        rating.setVisibility(View.VISIBLE);
-        location.setVisibility(View.VISIBLE);
-        hours.setVisibility(View.VISIBLE);
-        phoneNumber.setVisibility(View.VISIBLE);
+        //.document("users/test"); alternates between storing in users and collections
+        docRef = FirebaseFirestore.getInstance().collection(ProfileActivity.email).document(businessName);
 
         star.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @SuppressLint("UseCompatLoadingForDrawables")
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     star.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart_filled));
-                    @SuppressLint("ShowToast")
                     Toast toast = Toast.makeText(ResultsActivity.this, data.getName() + " has been added to your favorites", Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
+
+                    Map<String, Object> document = new HashMap<>();
+                    document.put("Business Name", data.getName());
+                    document.put("Rating", data.getRating());
+                    document.put("Location", data.getAddress());
+                    document.put("Open/Closed", openClosed);
+                    document.put("Phone Number", data.getPhoneNumber());
+                    document.put("Latitude", data.getLat());
+                    document.put("Longitude", data.getLong());
+                    docRef.set(document).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("RESULT", "Document has been saved");
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d("RESULT", "Document has not been saved");
+                        }
+                    });
                 } else {
                     star.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart));
-                    @SuppressLint("ShowToast")
                     Toast toast = Toast.makeText(ResultsActivity.this, data.getName() + " has been removed from your favorites", Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();

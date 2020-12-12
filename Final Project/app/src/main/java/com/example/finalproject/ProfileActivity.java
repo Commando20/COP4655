@@ -29,9 +29,10 @@ import java.util.Objects;
 public class ProfileActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     Button signOutButton;
     Button favoritesButton;
-    TextView userName,userEmail,userId;
+    TextView userName, userEmail, userId;
     ImageView profileImage;
     private GoogleApiClient googleApiClient;
+    public static String displayName, email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,12 +112,14 @@ public class ProfileActivity extends AppCompatActivity implements GoogleApiClien
         }else{ opr.setResultCallback(this::handleSignInResult); }
     }
 
-    private void handleSignInResult(GoogleSignInResult result){
+    public void handleSignInResult(GoogleSignInResult result){
         if(result.isSuccess()){
             GoogleSignInAccount account = result.getSignInAccount();
             assert account != null;
-            userName.setText(account.getDisplayName());
-            userEmail.setText(account.getEmail());
+            displayName = account.getDisplayName();
+            email = account.getEmail();
+            userName.setText(displayName);
+            userEmail.setText(email);
             try{
                 Glide.with(this).load(account.getPhotoUrl()).into(profileImage);
             }catch (NullPointerException e){
