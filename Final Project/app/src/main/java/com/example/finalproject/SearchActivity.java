@@ -284,7 +284,7 @@ public class SearchActivity extends AppCompatActivity {
 
     public void getYelpByTermAndGPS(final String term, final double latitude, final double longitude) {
         final ArrayList<HashMap<String, String>> nameList = new ArrayList<>();
-        final ListView lv = findViewById(R.id.list);
+        final ListView lv = findViewById(R.id.favoriteList);
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String URL = "https://api.yelp.com/v3/businesses/search?term=" + term + "&latitude=" + latitude + "&longitude=" + longitude;
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL , new Response.Listener<JSONObject>() {

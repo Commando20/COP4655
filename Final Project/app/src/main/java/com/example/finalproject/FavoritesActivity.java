@@ -1,25 +1,24 @@
 package com.example.finalproject;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -31,7 +30,6 @@ public class FavoritesActivity extends AppCompatActivity {
     YelpData data = SearchActivity.getDataInstance();
     ArrayList<HashMap<String, String>> favoriteList = new ArrayList<>();
     ListView lv;
-    String name, rating, address, hours, phoneNumber, latitude, longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +37,7 @@ public class FavoritesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_favorites);
         Objects.requireNonNull(getSupportActionBar()).hide(); //Get rid of pesky titlebar
 
-        lv = findViewById(R.id.list);
+        lv = findViewById(R.id.favoriteList);
 
         Task<QuerySnapshot> query = FirebaseFirestore.getInstance().collection(ProfileActivity.email).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -48,17 +46,16 @@ public class FavoritesActivity extends AppCompatActivity {
                         int count = 0;
                         if (task.isSuccessful()) {
                             for (DocumentSnapshot document : task.getResult()) {
-
                                 if(document.exists()) {
-                                    name = document.getString("Business Name");
-                                    rating = document.getString("Rating");
-                                    //address = documentSnapshot.getString("Location");
-                                    // hours = documentSnapshot.getString("Open/Closed");
-                                    phoneNumber = document.getString("Phone Number");
-                                    latitude = document.getString("Latitude");
-                                    longitude = document.getString("Longitude");
-                                    //Could also do Map<String, Object> myData = documentSnapshot.getData();
+                                    String name = document.getString("Business Name");
+                                    String rating = document.getString("Rating");
+                                    String address = document.getString("Location");
+                                    String hours = document.getString("Open or Closed");
+                                    String phoneNumber = document.getString("Phone Number");
+                                    String latitude = document.getString("Latitude");
+                                    String longitude = document.getString("Longitude");
 
+                                    //Could also do Map<String, Object> myData = documentSnapshot.getData();
                                     HashMap<String, String> favBusinessList = new HashMap<>();
                                     favBusinessList.put("name", name);
                                     favBusinessList.put("location", address);
@@ -70,18 +67,37 @@ public class FavoritesActivity extends AppCompatActivity {
                                     favoriteList.add(favBusinessList);
 
                                     Log.d("FavoriteResult", name);
-                                    // Log.d("FavoriteResult", address);
+                                    Log.d("FavoriteResult", address);
                                     Log.d("FavoriteResult", rating);
-                                    //Log.d("FavoriteResult", hours);
+                                    Log.d("FavoriteResult", hours);
                                     Log.d("FavoriteResult", phoneNumber);
                                     Log.d("FavoriteResult", latitude);
                                     Log.d("FavoriteResult", longitude);
                                 }
                                 ListAdapter adapter = new SimpleAdapter(FavoritesActivity.this, favoriteList,
                                         R.layout.favorite_list_item, new String[]{"name","location"},
-                                        new int[]{R.id.name, R.id.location});
+                                        new int[]{R.id.favName, R.id.favLocation});
                                 lv.setAdapter(adapter);
                                 count++;
+
+                                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                    @SuppressLint("UseCompatLoadingForDrawables")
+                                    @Override
+                                    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                                        HashMap<String, String> business = favoriteList.get(position);
+                                        data.setName(business.get("name"));
+                                        data.setRating(business.get("rating"));
+                                        data.setAddress(business.get("location"));
+                                        data.setOpenClosed(business.get("openClosed"));
+                                        data.setPhoneNumber(business.get("phoneNumber"));
+                                        data.setLat(business.get("latitude"));
+                                        data.setLong(business.get("longitude"));
+
+                                        Intent intent = new Intent(FavoritesActivity.this, ResultsActivity.class);
+                                        Toast.makeText(FavoritesActivity.this,"Fetching data", Toast.LENGTH_SHORT).show();
+                                        startActivity(intent);
+                                    }
+                                });
                             }
                         } else {
                             Log.d("favoriteResult", "Error getting documents: ", task.getException());
@@ -89,44 +105,6 @@ public class FavoritesActivity extends AppCompatActivity {
                         Log.d("favoriteResult", String.valueOf(count));
                     }
                 });
-
-        /*docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) { //Document snapshot is an object that represents a document
-                if(documentSnapshot.exists()) {
-                    name = documentSnapshot.getString("Business Name");
-                    rating = documentSnapshot.getString("Rating");
-                    //address = documentSnapshot.getString("Location");
-                   // hours = documentSnapshot.getString("Open/Closed");
-                    phoneNumber = documentSnapshot.getString("Phone Number");
-                    latitude = documentSnapshot.getString("Latitude");
-                    longitude = documentSnapshot.getString("Longitude");
-                    //Could also do Map<String, Object> myData = documentSnapshot.getData();
-
-                    HashMap<String, String> favBusinessList = new HashMap<>();
-                    favBusinessList.put("name", name);
-                    favBusinessList.put("location", address);
-                    favBusinessList.put("rating", rating);
-                    favBusinessList.put("openClosed", hours);
-                    favBusinessList.put("phoneNumber", phoneNumber);
-                    favBusinessList.put("latitude", latitude);
-                    favBusinessList.put("longitude", longitude);
-                    favoriteList.add(favBusinessList);
-
-                    Log.d("FavoriteResult", name);
-                   // Log.d("FavoriteResult", address);
-                    Log.d("FavoriteResult", rating);
-                    //Log.d("FavoriteResult", hours);
-                    Log.d("FavoriteResult", phoneNumber);
-                    Log.d("FavoriteResult", latitude);
-                    Log.d("FavoriteResult", longitude);
-                }
-                ListAdapter adapter = new SimpleAdapter(FavoritesActivity.this, favoriteList,
-                        R.layout.favorite_list_item, new String[]{"name","location"},
-                        new int[]{R.id.name, R.id.location});
-                lv.setAdapter(adapter);
-            }
-        });*/
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_favorites);

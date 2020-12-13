@@ -20,6 +20,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -37,6 +38,7 @@ public class ResultsActivity extends AppCompatActivity {
     YelpData data = SearchActivity.getDataInstance();
     String openClosed;
     public static String businessName;
+    //.document("users/test"); alternates between storing in users and collections
     private DocumentReference docRef;
 
     @SuppressLint("SetTextI18n")
@@ -75,8 +77,7 @@ public class ResultsActivity extends AppCompatActivity {
 
         phoneNumber.setText("Phone Number: " + data.getPhoneNumber());
 
-        //.document("users/test"); alternates between storing in users and collections
-        docRef = FirebaseFirestore.getInstance().collection(ProfileActivity.email).document(businessName);
+        DocumentReference docRef = FirebaseFirestore.getInstance().collection(ProfileActivity.email).document(businessName);
 
         star.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @SuppressLint("UseCompatLoadingForDrawables")
@@ -91,7 +92,7 @@ public class ResultsActivity extends AppCompatActivity {
                     document.put("Business Name", data.getName());
                     document.put("Rating", data.getRating());
                     document.put("Location", data.getAddress());
-                    document.put("Open/Closed", openClosed);
+                    document.put("Open or Closed", openClosed);
                     document.put("Phone Number", data.getPhoneNumber());
                     document.put("Latitude", data.getLat());
                     document.put("Longitude", data.getLong());
@@ -108,9 +109,34 @@ public class ResultsActivity extends AppCompatActivity {
                     });
                 } else {
                     star.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart));
+
+                    docRef.collection(ProfileActivity.email).document(businessName).delete()
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d("FavoriteDelete", "DocumentSnapshot successfully deleted!");
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w("FavoriteDelete", "Error deleting document", e);
+                                }
+                            });
+
                     Toast toast = Toast.makeText(ResultsActivity.this, data.getName() + " has been removed from your favorites", Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
+                }
+            }
+        });
+
+        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @SuppressLint("UseCompatLoadingForDrawables")
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if (documentSnapshot.exists()) {
+                    star.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart_filled));
                 }
             }
         });

@@ -9,7 +9,7 @@
     android:clickable="false" >
 
     <TextView
-        android:id="@+id/name"
+        android:id="@+id/favName"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="1dip"
@@ -17,7 +17,7 @@
         android:textStyle="bold"/>
 
     <TextView
-        android:id="@+id/location"
+        android:id="@+id/favLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FFFFFF" />

@@ -76,6 +76,7 @@
         android:textColor="#FFFFFF"
         android:textSize="16dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.51"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="HardcodedText,SpUsage" />
@@ -84,7 +85,7 @@
         android:id="@+id/signInButton"
         android:layout_width="200dp"
         android:layout_height="41dp"
-        android:layout_marginTop="300dp"
+        android:layout_marginTop="296dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
