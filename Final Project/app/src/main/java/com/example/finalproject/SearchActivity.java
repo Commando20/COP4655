@@ -48,6 +48,7 @@ public class SearchActivity extends AppCompatActivity {
     public ImageButton locationBtn;
     private EditText inputName;
     private EditText inputLocation;
+    public static int searchConducted = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -250,6 +251,7 @@ public class SearchActivity extends AppCompatActivity {
                     lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                            searchConducted = 1;
                             HashMap<String, String> business = nameList.get(position);
                             data.setName(business.get("name"));
                             data.setRating(business.get("rating"));
@@ -284,7 +286,7 @@ public class SearchActivity extends AppCompatActivity {
 
     public void getYelpByTermAndGPS(final String term, final double latitude, final double longitude) {
         final ArrayList<HashMap<String, String>> nameList = new ArrayList<>();
-        final ListView lv = findViewById(R.id.favoriteList);
+        final ListView lv = findViewById(R.id.list);
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String URL = "https://api.yelp.com/v3/businesses/search?term=" + term + "&latitude=" + latitude + "&longitude=" + longitude;
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL , new Response.Listener<JSONObject>() {
@@ -333,6 +335,7 @@ public class SearchActivity extends AppCompatActivity {
                     lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                            searchConducted = 1;
                             HashMap<String, String> business = nameList.get(position);
                             data.setName(business.get("name"));
                             data.setRating(business.get("rating"));

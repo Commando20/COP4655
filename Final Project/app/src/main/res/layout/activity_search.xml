@@ -98,9 +98,9 @@
 
     <ImageButton
         android:id="@+id/searchbtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="268dp"
         app:layout_constraintStart_toEndOf="@+id/inputName"
         app:layout_constraintTop_toTopOf="parent"
@@ -124,8 +124,8 @@
 
     <ImageButton
         android:id="@+id/locationbtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginTop="268dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.045"

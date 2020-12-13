@@ -11,6 +11,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -30,6 +31,8 @@ public class FavoritesActivity extends AppCompatActivity {
     YelpData data = SearchActivity.getDataInstance();
     ArrayList<HashMap<String, String>> favoriteList = new ArrayList<>();
     ListView lv;
+    ListAdapter adapter;
+    public static int positionCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +49,7 @@ public class FavoritesActivity extends AppCompatActivity {
                         int count = 0;
                         if (task.isSuccessful()) {
                             for (DocumentSnapshot document : task.getResult()) {
-                                if(document.exists()) {
+                                if (document.exists()) {
                                     String name = document.getString("Business Name");
                                     String rating = document.getString("Rating");
                                     String address = document.getString("Location");
@@ -65,17 +68,9 @@ public class FavoritesActivity extends AppCompatActivity {
                                     favBusinessList.put("latitude", latitude);
                                     favBusinessList.put("longitude", longitude);
                                     favoriteList.add(favBusinessList);
-
-                                    Log.d("FavoriteResult", name);
-                                    Log.d("FavoriteResult", address);
-                                    Log.d("FavoriteResult", rating);
-                                    Log.d("FavoriteResult", hours);
-                                    Log.d("FavoriteResult", phoneNumber);
-                                    Log.d("FavoriteResult", latitude);
-                                    Log.d("FavoriteResult", longitude);
                                 }
                                 ListAdapter adapter = new SimpleAdapter(FavoritesActivity.this, favoriteList,
-                                        R.layout.favorite_list_item, new String[]{"name","location"},
+                                        R.layout.favorite_list_item, new String[]{"name", "location"},
                                         new int[]{R.id.favName, R.id.favLocation});
                                 lv.setAdapter(adapter);
                                 count++;
@@ -84,6 +79,7 @@ public class FavoritesActivity extends AppCompatActivity {
                                     @SuppressLint("UseCompatLoadingForDrawables")
                                     @Override
                                     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                                        SearchActivity.searchConducted = 2;
                                         HashMap<String, String> business = favoriteList.get(position);
                                         data.setName(business.get("name"));
                                         data.setRating(business.get("rating"));
@@ -93,8 +89,11 @@ public class FavoritesActivity extends AppCompatActivity {
                                         data.setLat(business.get("latitude"));
                                         data.setLong(business.get("longitude"));
 
+                                        positionCount = position;
+
                                         Intent intent = new Intent(FavoritesActivity.this, ResultsActivity.class);
-                                        Toast.makeText(FavoritesActivity.this,"Fetching data", Toast.LENGTH_SHORT).show();
+                                        intent.putExtra("favoriteList", favoriteList);
+                                        Toast.makeText(FavoritesActivity.this, "Fetching data", Toast.LENGTH_SHORT).show();
                                         startActivity(intent);
                                     }
                                 });

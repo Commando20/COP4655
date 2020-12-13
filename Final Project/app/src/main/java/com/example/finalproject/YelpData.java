@@ -10,7 +10,7 @@ public class YelpData {
     private String latitude;
     private String longitude;
 
-    public YelpData() {};
+    public YelpData() {}
 
     public void setName(String businessName) { this.name = businessName; }
 

@@ -12,6 +12,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +24,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -34,10 +36,17 @@ public class ResultsActivity extends AppCompatActivity {
     TextView location;
     TextView hours;
     TextView phoneNumber;
+    TextView noResults;
     ToggleButton star;
+    View map;
+
     YelpData data = SearchActivity.getDataInstance();
     String openClosed;
-    public static String businessName;
+    String businessName;
+
+    public static ArrayList<HashMap<String, String>> favoriteListUpdated;
+    public static int deletePosition;
+
     //.document("users/test"); alternates between storing in users and collections
     private DocumentReference docRef;
 
@@ -49,97 +58,116 @@ public class ResultsActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).hide(); //Get rid of pesky titlebar
 
         star = findViewById(R.id.star);
-
         name = findViewById(R.id.name);
         rating = findViewById(R.id.rating);
         location = findViewById(R.id.location);
         hours = findViewById(R.id.hours);
         phoneNumber = findViewById(R.id.phoneNumber);
+        map = findViewById(R.id.map);
+        noResults = findViewById(R.id.noResults);
 
-        name.setVisibility(View.VISIBLE);
-        rating.setVisibility(View.VISIBLE);
-        location.setVisibility(View.VISIBLE);
-        hours.setVisibility(View.VISIBLE);
-        phoneNumber.setVisibility(View.VISIBLE);
+        if (SearchActivity.searchConducted == 1 || SearchActivity.searchConducted == 2) {
+            name.setVisibility(View.VISIBLE);
+            rating.setVisibility(View.VISIBLE);
+            location.setVisibility(View.VISIBLE);
+            hours.setVisibility(View.VISIBLE);
+            phoneNumber.setVisibility(View.VISIBLE);
+            star.setVisibility(View.VISIBLE);
+            map.setVisibility(View.VISIBLE);
+            noResults.setVisibility(View.GONE);
 
-        businessName = data.getName();
-        name.setText(businessName);
-        rating.setText("Rating: " + data.getRating());
-        location.setText("Address: " + data.getAddress());
+            businessName = data.getName();
+            name.setText(businessName);
+            rating.setText("Rating: " + data.getRating());
+            location.setText("Address: " + data.getAddress());
 
-        openClosed = data.getOpenClosed();
-        if (openClosed != null) {
-            if(openClosed.equals("false")) {
-                openClosed = "Open";
-            } else openClosed = "Closed";
-            hours.setText("Open/Closed: " + openClosed);
-        }
+            openClosed = data.getOpenClosed();
+            if (openClosed != null) {
+                if (openClosed.equals("false")) {
+                    openClosed = "Open";
+                } else openClosed = "Closed";
+                hours.setText("Open/Closed: " + openClosed);
+            }
 
-        phoneNumber.setText("Phone Number: " + data.getPhoneNumber());
+            phoneNumber.setText("Phone Number: " + data.getPhoneNumber());
 
-        DocumentReference docRef = FirebaseFirestore.getInstance().collection(ProfileActivity.email).document(businessName);
+            if (MainActivity.signIn == 1) {
+                DocumentReference docRef = FirebaseFirestore.getInstance().collection(ProfileActivity.email).document(businessName);
 
-        star.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @SuppressLint("UseCompatLoadingForDrawables")
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    star.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart_filled));
-                    Toast toast = Toast.makeText(ResultsActivity.this, data.getName() + " has been added to your favorites", Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.CENTER, 0, 0);
-                    toast.show();
+                star.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @SuppressLint("UseCompatLoadingForDrawables")
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) {
+                            star.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart_filled));
+                            Toast toast = Toast.makeText(ResultsActivity.this, data.getName() + " has been added to your favorites", Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
 
-                    Map<String, Object> document = new HashMap<>();
-                    document.put("Business Name", data.getName());
-                    document.put("Rating", data.getRating());
-                    document.put("Location", data.getAddress());
-                    document.put("Open or Closed", openClosed);
-                    document.put("Phone Number", data.getPhoneNumber());
-                    document.put("Latitude", data.getLat());
-                    document.put("Longitude", data.getLong());
-                    docRef.set(document).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("RESULT", "Document has been saved");
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d("RESULT", "Document has not been saved");
-                        }
-                    });
-                } else {
-                    star.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart));
-
-                    docRef.collection(ProfileActivity.email).document(businessName).delete()
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            Map<String, Object> document = new HashMap<>();
+                            document.put("Business Name", data.getName());
+                            document.put("Rating", data.getRating());
+                            document.put("Location", data.getAddress());
+                            document.put("Open or Closed", openClosed);
+                            document.put("Phone Number", data.getPhoneNumber());
+                            document.put("Latitude", data.getLat());
+                            document.put("Longitude", data.getLong());
+                            docRef.set(document).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    Log.d("FavoriteDelete", "DocumentSnapshot successfully deleted!");
+                                    Log.d("RESULT", "Document has been saved");
                                 }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
+                            }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Log.w("FavoriteDelete", "Error deleting document", e);
+                                    Log.d("RESULT", "Document has not been saved");
                                 }
                             });
+                        } else {
+                            star.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart));
+                            docRef.collection(ProfileActivity.email).document(businessName).delete()
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            favoriteListUpdated = (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("favoriteList");
 
-                    Toast toast = Toast.makeText(ResultsActivity.this, data.getName() + " has been removed from your favorites", Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.CENTER, 0, 0);
-                    toast.show();
-                }
-            }
-        });
+                                            favoriteListUpdated.remove(FavoritesActivity.positionCount);
+                                            Log.e("positionCount", favoriteListUpdated + " successfully removed");
+                                            Log.e("positionCount", favoriteListUpdated.size() + " elements left");
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w("FavoriteDelete", "Error deleting document", e);
+                                        }
+                                    });
 
-        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @SuppressLint("UseCompatLoadingForDrawables")
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot.exists()) {
-                    star.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart_filled));
-                }
-            }
-        });
+                            Toast toast = Toast.makeText(ResultsActivity.this, data.getName() + " has been removed from your favorites", Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 35, 0);
+                            toast.show();
+                        }
+                    }
+                });
+
+                docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @SuppressLint("UseCompatLoadingForDrawables")
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if (documentSnapshot.exists()) {
+                            star.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart_filled));
+                        }
+                    }
+                });
+            } else star.setVisibility(View.GONE);
+        } else {
+            name.setVisibility(View.GONE);
+            rating.setVisibility(View.GONE);
+            location.setVisibility(View.GONE);
+            hours.setVisibility(View.GONE);
+            phoneNumber.setVisibility(View.GONE);
+            star.setVisibility(View.GONE);
+            map.setVisibility(View.GONE);
+        }
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_results);

@@ -21,14 +21,16 @@ public class MapFragment extends Fragment {
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
         @Override
         public void onMapReady(GoogleMap googleMap) {
-            YelpData data = SearchActivity.getDataInstance();
-            double latitude = Double.parseDouble(data.getLat());
-            double longitude = Double.parseDouble(data.getLong());
-            LatLng location = new LatLng(latitude, longitude);
+            if (SearchActivity.searchConducted == 1 || SearchActivity.searchConducted == 2) {
+                YelpData data = SearchActivity.getDataInstance();
+                double latitude = Double.parseDouble(data.getLat());
+                double longitude = Double.parseDouble(data.getLong());
+                LatLng location = new LatLng(latitude, longitude);
 
-            googleMap.addMarker(new MarkerOptions().position(location).title(data.getName()));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-            googleMap.moveCamera(CameraUpdateFactory.zoomTo(12));
+                googleMap.addMarker(new MarkerOptions().position(location).title(data.getName()));
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+                googleMap.moveCamera(CameraUpdateFactory.zoomTo(12));
+            }
         }
     };
 
