@@ -136,8 +136,8 @@
 
     <ListView
         android:id="@+id/list"
-        android:layout_width="429dp"
-        android:layout_height="310dp"
+        android:layout_width="428dp"
+        android:layout_height="331dp"
         android:divider="#C1C1C1"
         android:dividerHeight="1dp"
         android:focusableInTouchMode="false"
