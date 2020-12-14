@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -102,7 +103,9 @@ public class SearchActivity extends AppCompatActivity {
                     alertDialog.show();
                 } else {
                     getYelpByTermAndLocation(name, location);
-                    Toast.makeText(SearchActivity.this, "Fetching results located in " + location, Toast.LENGTH_SHORT).show();
+                    Toast toast = Toast.makeText(SearchActivity.this, "Fetching results located in " + location, Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 950);
+                    toast.show();
                 }
             }
         });
@@ -148,7 +151,9 @@ public class SearchActivity extends AppCompatActivity {
                     AlertDialog alertDialog = builder.create(); //Create the Alert dialog
                     alertDialog.show(); //Show the Alert Dialog box
                 } else {
-                    Toast.makeText(SearchActivity.this, "Fetching results based on current location", Toast.LENGTH_SHORT).show();
+                    Toast toast = Toast.makeText(SearchActivity.this, "Fetching results based on current location", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 950);
+                    toast.show();
                     getYelpByTermAndGPS(name, latitude, longitude);
                 }
             }
@@ -280,7 +285,9 @@ public class SearchActivity extends AppCompatActivity {
 
                             //jump to ResultsActivity to display results
                             Intent intent = new Intent(SearchActivity.this, ResultsActivity.class);
-                            Toast.makeText(SearchActivity.this,"Fetching data", Toast.LENGTH_SHORT).show();
+                            Toast toast = Toast.makeText(SearchActivity.this,"Fetching data for " + business.get("name"), Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 950);
+                            toast.show();
                             startActivity(intent);
                         }
                     });
@@ -372,7 +379,9 @@ public class SearchActivity extends AppCompatActivity {
 
                             //Jump to results page to display results
                             Intent intent = new Intent(SearchActivity.this, ResultsActivity.class);
-                            Toast.makeText(SearchActivity.this,"Fetching data", Toast.LENGTH_SHORT).show();
+                            Toast toast = Toast.makeText(SearchActivity.this,"Fetching data for " + business.get("name"), Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 950);
+                            toast.show();
                             startActivity(intent);
                         }
                     });

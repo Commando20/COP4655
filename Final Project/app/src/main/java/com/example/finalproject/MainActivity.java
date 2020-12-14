@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             // Google Sign In failed, update UI appropriately
             Log.e("MainActivity", "Login Unsuccessful. "+result);
             Toast toast = Toast.makeText(MainActivity.this, "Login Unsuccessful", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 40, 0);
+            toast.setGravity(Gravity.CENTER, 0, 950);
             toast.show();
         }
     }
@@ -183,13 +183,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 //If firebase log in successful, go to profile, else throw exception
                 Log.d("MainActivity", "signInWithCredential:onComplete:" + task.isSuccessful());
                 if (task.isSuccessful()) {
-                    Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                    Toast toast = Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 950);
+                    toast.show();
                     gotoProfile();
                 } else {
                     Log.w("MainActivity", "signInWithCredential" + Objects.requireNonNull(task.getException()).getMessage());
                     task.getException().printStackTrace();
-                    Toast.makeText(MainActivity.this, "Authentication failed.",
-                            Toast.LENGTH_SHORT).show();
+
+                    Toast toast = Toast.makeText(MainActivity.this, "Authentication failed.", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 950);
+                    toast.show();
                 }
             }
         });

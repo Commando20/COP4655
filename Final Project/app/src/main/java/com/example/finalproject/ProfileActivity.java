@@ -4,6 +4,7 @@ import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -66,7 +67,9 @@ public class ProfileActivity extends AppCompatActivity implements GoogleApiClien
                             //Go back to MainActivity (signed in page)
                             gotoMainActivity();
                         }else{
-                            Toast.makeText(getApplicationContext(),"Session not close",Toast.LENGTH_LONG).show();
+                            Toast toast = Toast.makeText(getApplicationContext(),"Session not close",Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 950);
+                            toast.show();
                         }
                     }
                 });
@@ -132,7 +135,9 @@ public class ProfileActivity extends AppCompatActivity implements GoogleApiClien
                 //Get photo URL and place into ImageView to see in app
                 Glide.with(this).load(account.getPhotoUrl()).into(profileImage);
             }catch (NullPointerException e){
-                Toast.makeText(getApplicationContext(),"image not found",Toast.LENGTH_LONG).show();
+                Toast toast = Toast.makeText(getApplicationContext(),"image not found",Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 950);
+                toast.show();
             }
         }else{
             gotoMainActivity();

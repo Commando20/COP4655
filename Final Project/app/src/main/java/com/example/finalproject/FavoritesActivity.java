@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -98,7 +99,9 @@ public class FavoritesActivity extends AppCompatActivity {
                                         data.setLong(business.get("longitude"));
 
                                         Intent intent = new Intent(FavoritesActivity.this, ResultsActivity.class);
-                                        Toast.makeText(FavoritesActivity.this, "Fetching data", Toast.LENGTH_SHORT).show();
+                                        Toast toast = Toast.makeText(FavoritesActivity.this, "Fetching data for " + business.get("name"), Toast.LENGTH_SHORT);
+                                        toast.setGravity(Gravity.CENTER, 0, 950);
+                                        toast.show();
                                         startActivity(intent);
                                     }
                                 });

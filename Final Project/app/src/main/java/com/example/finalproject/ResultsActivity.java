@@ -12,6 +12,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -102,9 +103,6 @@ public class ResultsActivity extends AppCompatActivity {
                         if (isChecked) {
                             //Change button to have it appear filled
                             star.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart_filled));
-                            Toast toast = Toast.makeText(ResultsActivity.this, data.getName() + " has been added to your favorites", Toast.LENGTH_SHORT);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
 
                             //Put Yelp data on business into document in the cloud
                             Map<String, Object> document = new HashMap<>();
@@ -127,6 +125,10 @@ public class ResultsActivity extends AppCompatActivity {
                                     Log.d("RESULT", "Document has not been saved");
                                 }
                             });
+
+                            Toast toast = Toast.makeText(ResultsActivity.this, data.getName() + " has been added to your favorites", Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 950);
+                            toast.show();
                         } else { //If user clicks button again to make it appear empty
                             star.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart));
                             //Get business name document from email collection and delete document
@@ -145,7 +147,7 @@ public class ResultsActivity extends AppCompatActivity {
                                     });
 
                             Toast toast = Toast.makeText(ResultsActivity.this, data.getName() + " has been removed from your favorites", Toast.LENGTH_SHORT);
-                            toast.setGravity(Gravity.CENTER, 35, 0);
+                            toast.setGravity(Gravity.CENTER, 0, 950);
                             toast.show();
                         }
                     }
@@ -161,7 +163,8 @@ public class ResultsActivity extends AppCompatActivity {
                         }
                     }
                 });
-            } else star.setVisibility(View.GONE); //If user is not signed in, remove favorites option
+            } else
+                star.setVisibility(View.GONE); //If user is not signed in, remove favorites option
         } else {
             //If user has not made a search and is attempting to view results page, then make all
             //elements gone and display that no results have been searched
