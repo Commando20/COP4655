@@ -24,7 +24,7 @@ public class MapFragment extends Fragment {
             //Global variable from SearchActivity that checks if user made a search before viewing map
             //Only if user makes a search or views favorites can they see the map
             if (SearchActivity.searchConducted == 1 || SearchActivity.searchConducted == 2) {
-                YelpData data = SearchActivity.getDataInstance(); //Get Yelp data instance
+                YelpData data = SearchActivity.getDataInstance (); //Get Yelp data instance
                 //Get lat and long data from business and place into variables
                 double latitude = Double.parseDouble(data.getLat());
                 double longitude = Double.parseDouble(data.getLong());

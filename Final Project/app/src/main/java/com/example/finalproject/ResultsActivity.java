@@ -164,7 +164,32 @@ public class ResultsActivity extends AppCompatActivity {
                     }
                 });
             } else
-                star.setVisibility(View.GONE); //If user is not signed in, remove favorites option
+                star.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @SuppressLint("UseCompatLoadingForDrawables")
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        // Create the object of AlertDialog Builder class
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ResultsActivity.this);
+                        // Set Alert Title
+                        builder.setTitle("Alert!");
+                        // Set Cancelable false for when the user clicks on the outside the Dialog Box then it will remain show
+                        builder.setCancelable(false);
+                        //Set the message show for the Alert time
+                        builder.setMessage("You must first login to be able to use this feature");
+                        // Set the positive button with yes name OnClickListener method is use of DialogInterface interface.
+                        builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //When the user click yes button then app will close
+                                dialog.cancel();
+                            }
+                        });
+                        //Create the Alert dialog
+                        AlertDialog alertDialog = builder.create();
+                        //Show the Alert Dialog box
+                        alertDialog.show();
+                    }
+                });
+            //If user is not signed in, remove favorites option
         } else {
             //If user has not made a search and is attempting to view results page, then make all
             //elements gone and display that no results have been searched
