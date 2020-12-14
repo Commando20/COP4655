@@ -41,13 +41,15 @@ public class SearchActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PERMISSION = 2;
     String mPermission = Manifest.permission.ACCESS_FINE_LOCATION;
     GPSTracker gps; //GPSTracker class
-    double latitude, longitude;
+    double latitude, longitude; //Global variables lat and long for access between multiple functions
 
+    //declare variable data of type Yelpdata that can be accessed from all activites
     public static YelpData data = new YelpData();
     public ImageButton searchBtn;
     public ImageButton locationBtn;
     private EditText inputName;
     private EditText inputLocation;
+    //Public variable used to check if user has made a search and clicked on an item in listview
     public static int searchConducted = 0;
 
     @Override
@@ -56,7 +58,8 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
         Objects.requireNonNull(getSupportActionBar()).hide(); //Get rid of pesky titlebar
 
-        try { //If any permission not allowed by user, this condition will execute every time
+        //If any permission not allowed by user, this condition will execute every time
+        try {
             if (ActivityCompat.checkSelfPermission(this, mPermission) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{mPermission}, REQUEST_CODE_PERMISSION);
             }
@@ -68,12 +71,14 @@ public class SearchActivity extends AppCompatActivity {
         inputName = findViewById(R.id.inputName);
         inputLocation = findViewById(R.id.inputLocation);
 
+        //Click listener for when user clicks search button
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String name = inputName.getText().toString();
                 String location = inputLocation.getText().toString();
 
+                //If user leaves name or location field empty, then throw alert
                 if (location.isEmpty() || name.isEmpty()) {
                     // Create the object of AlertDialog Builder class
                     AlertDialog.Builder builder = new AlertDialog.Builder(SearchActivity.this);
@@ -102,6 +107,7 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
+        //Click listener for when user clicks gps button
         locationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,6 +128,7 @@ public class SearchActivity extends AppCompatActivity {
                     gps.showSettingsAlert();
                 }
 
+                //If user leaves name field empty, throw alert
                 if (name.isEmpty()) {
                     // Create the object of AlertDialog Builder class
                     AlertDialog.Builder builder = new AlertDialog.Builder(SearchActivity.this);
@@ -202,17 +209,20 @@ public class SearchActivity extends AppCompatActivity {
     public static YelpData getDataInstance() { return data; }
 
     public void getYelpByTermAndLocation (final String term, final String location) {
-        final ArrayList<HashMap<String, String>> nameList = new ArrayList<>();
-        final ListView lv = findViewById(R.id.list);
+        //Make an ArrayList for storing values for business
+        ArrayList<HashMap<String, String>> nameList = new ArrayList<>();
+        ListView lv = findViewById(R.id.list);
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String URL = "https://api.yelp.com/v3/businesses/search?term=" + term + "&location=" + location;
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL , new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
+                    //First item in reponse is an Array
                     JSONArray yelpArray = response.getJSONArray("businesses");
 
-                    for (int i = 0; i < 15; i++) { //Loop to get results for 15 businesses
+                    //Loop to get results for 15 businesses
+                    for (int i = 0; i < 15; i++) {
                         JSONObject yelpObject = yelpArray.getJSONObject(i);
                         String name = yelpObject.getString("name");
 
@@ -223,17 +233,20 @@ public class SearchActivity extends AppCompatActivity {
                         String city = locationObj.getString("city");
                         String state = locationObj.getString("state");
                         String zipCode = locationObj.getString("zip_code");
-
                         String location = address + ", " + city + ", " + state + " " + zipCode;
+
+                        //Create a new hash table to put values from business into
                         HashMap<String, String> businessList = new HashMap<>();
                         businessList.put("name", name);
                         businessList.put("location", location);
                         businessList.put("rating", yelpObject.getString("rating") + " / 5.0 rating out of "
                                 + yelpObject.getString("review_count") + " reviews");
+
                         businessList.put("openClosed", yelpObject.getString("is_closed"));
                         businessList.put("phoneNumber", yelpObject.getString("display_phone"));
                         businessList.put("latitude", coordObj.getString("latitude"));
                         businessList.put("longitude", coordObj.getString("longitude"));
+                        //Add hash table into ArrayList
                         nameList.add(businessList);
 
                         Log.d("RESULT", name);
@@ -243,16 +256,20 @@ public class SearchActivity extends AppCompatActivity {
                         Log.d("RESULT", yelpObject.getString("is_closed"));
                         Log.d("RESULT", yelpObject.getString("display_phone"));
                     }
+                    //Create an adapter for ArrayList with only name and location for listView
                     ListAdapter adapter = new SimpleAdapter(SearchActivity.this, nameList,
                             R.layout.list_item, new String[]{"name","location"},
                             new int[]{R.id.name, R.id.location});
                     lv.setAdapter(adapter);
 
+                    //Set click listener for listView when user clicks on an item
                     lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                             searchConducted = 1;
+                            //Make a new hash table to fetch data from ArrayList
                             HashMap<String, String> business = nameList.get(position);
+                            //Place values from ArrayList into set functions
                             data.setName(business.get("name"));
                             data.setRating(business.get("rating"));
                             data.setAddress(business.get("location"));
@@ -261,6 +278,7 @@ public class SearchActivity extends AppCompatActivity {
                             data.setLat(business.get("latitude"));
                             data.setLong(business.get("longitude"));
 
+                            //jump to ResultsActivity to display results
                             Intent intent = new Intent(SearchActivity.this, ResultsActivity.class);
                             Toast.makeText(SearchActivity.this,"Fetching data", Toast.LENGTH_SHORT).show();
                             startActivity(intent);
@@ -277,6 +295,7 @@ public class SearchActivity extends AppCompatActivity {
             @Override //This is for Headers If You Needed
             public Map<String,String> getHeaders() {
                 Map<String,String> params = new HashMap<>();
+                //Create hash table with bearer token in order to have access to use Yelp API
                 params.put("Authorization","bearer " + "IGeH9oQlcaQpbdrzxIUBCDfC6zgIC4dkRt2_LEE2W99GHrW5JKl91db_nWarHKP9RgpzfouaXn8IW3q8HEwF_o3V6tIzgghXQCWnKq5MGurm9vC7ZaJWkXD5yYyyX3Yx");
                 return params;
             }
@@ -285,8 +304,9 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     public void getYelpByTermAndGPS(final String term, final double latitude, final double longitude) {
-        final ArrayList<HashMap<String, String>> nameList = new ArrayList<>();
-        final ListView lv = findViewById(R.id.list);
+        //Make an ArrayList for storing values for business
+        ArrayList<HashMap<String, String>> nameList = new ArrayList<>();
+        ListView lv = findViewById(R.id.list);
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String URL = "https://api.yelp.com/v3/businesses/search?term=" + term + "&latitude=" + latitude + "&longitude=" + longitude;
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL , new Response.Listener<JSONObject>() {
@@ -308,6 +328,7 @@ public class SearchActivity extends AppCompatActivity {
                         String zipCode = locationObj.getString("zip_code");
                         String location = address + ", " + city + ", " + state + " " + zipCode;
 
+                        //Create a new hash table to put values from business into
                         HashMap<String, String> businessList = new HashMap<>();
                         businessList.put("name", name);
                         businessList.put("location", location);
@@ -317,6 +338,7 @@ public class SearchActivity extends AppCompatActivity {
                         businessList.put("phoneNumber", yelpObject.getString("display_phone"));
                         businessList.put("latitude", coordObj.getString("latitude"));
                         businessList.put("longitude", coordObj.getString("longitude"));
+                        //Add hash table into ArrayList
                         nameList.add(businessList);
 
                         Log.d("RESULT", name);
@@ -326,17 +348,20 @@ public class SearchActivity extends AppCompatActivity {
                         Log.d("RESULT", yelpObject.getString("is_closed"));
                         Log.d("RESULT", yelpObject.getString("display_phone"));
                     }
-
+                    //Create an adapter for ArrayList with only name and location for listView
                     ListAdapter adapter = new SimpleAdapter(SearchActivity.this, nameList,
                             R.layout.list_item, new String[]{"name","location"},
                             new int[]{R.id.name, R.id.location});
                     lv.setAdapter(adapter);
 
+                    //Set click listener for listView when user clicks on an item
                     lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                             searchConducted = 1;
+                            //Make a new hash table to fetch data from ArrayList
                             HashMap<String, String> business = nameList.get(position);
+                            //Place values from ArrayList into set functions
                             data.setName(business.get("name"));
                             data.setRating(business.get("rating"));
                             data.setAddress(business.get("location"));
@@ -345,6 +370,7 @@ public class SearchActivity extends AppCompatActivity {
                             data.setLat(business.get("latitude"));
                             data.setLong(business.get("longitude"));
 
+                            //Jump to results page to display results
                             Intent intent = new Intent(SearchActivity.this, ResultsActivity.class);
                             Toast.makeText(SearchActivity.this,"Fetching data", Toast.LENGTH_SHORT).show();
                             startActivity(intent);
@@ -361,6 +387,7 @@ public class SearchActivity extends AppCompatActivity {
             @Override //This is for Headers If You Needed
             public Map<String,String> getHeaders() {
                 Map<String,String> params = new HashMap<>();
+                //Create hash table with bearer token in order to have access to use Yelp API
                 params.put("Authorization","bearer " + "IGeH9oQlcaQpbdrzxIUBCDfC6zgIC4dkRt2_LEE2W99GHrW5JKl91db_nWarHKP9RgpzfouaXn8IW3q8HEwF_o3V6tIzgghXQCWnKq5MGurm9vC7ZaJWkXD5yYyyX3Yx");
                 return params;
             }

@@ -3,7 +3,6 @@ package com.example.finalproject;
 public class YelpData {
     private String name;
     private String rating;
-    private String price;
     private String address;
     private String openClosed;
     private String phoneNumber;
@@ -15,8 +14,6 @@ public class YelpData {
     public void setName(String businessName) { this.name = businessName; }
 
     public void setRating(String businessRating) { this.rating = businessRating; }
-
-    public void setPrice(String businessPrice) { this.price = businessPrice; }
 
     public void setAddress(String businessAddress) { this.address = businessAddress; }
 
@@ -31,8 +28,6 @@ public class YelpData {
     public String getName() { return this.name; }
 
     public String getRating() { return this.rating; }
-
-    public String getPrice() { return this.price; }
 
     public String getAddress() { return this.address; }
 

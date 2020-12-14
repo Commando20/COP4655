@@ -18,15 +18,20 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapFragment extends Fragment {
 
-    private OnMapReadyCallback callback = new OnMapReadyCallback() {
+    private OnMapReadyCallback callback = new OnMapReadyCallback() { //When map is called
         @Override
         public void onMapReady(GoogleMap googleMap) {
+            //Global variable from SearchActivity that checks if user made a search before viewing map
+            //Only if user makes a search or views favorites can they see the map
             if (SearchActivity.searchConducted == 1 || SearchActivity.searchConducted == 2) {
-                YelpData data = SearchActivity.getDataInstance();
+                YelpData data = SearchActivity.getDataInstance(); //Get Yelp data instance
+                //Get lat and long data from business and place into variables
                 double latitude = Double.parseDouble(data.getLat());
                 double longitude = Double.parseDouble(data.getLong());
+                //Make a new LatLnhg location based on business coords
                 LatLng location = new LatLng(latitude, longitude);
 
+                //Add a marker and place camera at business location on map
                 googleMap.addMarker(new MarkerOptions().position(location).title(data.getName()));
                 googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
                 googleMap.moveCamera(CameraUpdateFactory.zoomTo(12));

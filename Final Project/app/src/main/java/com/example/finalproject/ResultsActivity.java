@@ -12,7 +12,6 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,7 +23,6 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -40,12 +38,9 @@ public class ResultsActivity extends AppCompatActivity {
     ToggleButton star;
     View map;
 
+    //Make data instance global to access from all classes and functions in activity
     YelpData data = SearchActivity.getDataInstance();
     String openClosed;
-    String businessName;
-
-    public static ArrayList<HashMap<String, String>> favoriteListUpdated;
-    public static int deletePosition;
 
     //.document("users/test"); alternates between storing in users and collections
     private DocumentReference docRef;
@@ -66,8 +61,10 @@ public class ResultsActivity extends AppCompatActivity {
         map = findViewById(R.id.map);
         noResults = findViewById(R.id.noResults);
 
+        //If user has made a search and clicked on listview or is viewing a business from favorites
+        //then make all elements visible and perform necessary functions
         if (SearchActivity.searchConducted == 1 || SearchActivity.searchConducted == 2) {
-            name.setVisibility(View.VISIBLE);
+            name.setVisibility(View.VISIBLE); //Make all elements visible
             rating.setVisibility(View.VISIBLE);
             location.setVisibility(View.VISIBLE);
             hours.setVisibility(View.VISIBLE);
@@ -76,12 +73,13 @@ public class ResultsActivity extends AppCompatActivity {
             map.setVisibility(View.VISIBLE);
             noResults.setVisibility(View.GONE);
 
-            businessName = data.getName();
-            name.setText(businessName);
+            //Get Yelp data and place into textViews
+            name.setText(data.getName());
             rating.setText("Rating: " + data.getRating());
             location.setText("Address: " + data.getAddress());
 
             openClosed = data.getOpenClosed();
+            //Condition to make openClosed say Open or Closed instead of true/false
             if (openClosed != null) {
                 if (openClosed.equals("false")) {
                     openClosed = "Open";
@@ -91,18 +89,24 @@ public class ResultsActivity extends AppCompatActivity {
 
             phoneNumber.setText("Phone Number: " + data.getPhoneNumber());
 
+            //If user is signed in
             if (MainActivity.signIn == 1) {
-                DocumentReference docRef = FirebaseFirestore.getInstance().collection(ProfileActivity.email).document(businessName);
+                //make an instance with a collection titled after user's email and document based on business name they clicked on
+                DocumentReference docRef = FirebaseFirestore.getInstance().collection(ProfileActivity.email).document(data.getName());
 
+                //If user toggles toggle button
                 star.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @SuppressLint("UseCompatLoadingForDrawables")
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        //If user clicks button once to give a filled star
                         if (isChecked) {
+                            //Change button to have it appear filled
                             star.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart_filled));
                             Toast toast = Toast.makeText(ResultsActivity.this, data.getName() + " has been added to your favorites", Toast.LENGTH_SHORT);
                             toast.setGravity(Gravity.CENTER, 0, 0);
                             toast.show();
 
+                            //Put Yelp data on business into document in the cloud
                             Map<String, Object> document = new HashMap<>();
                             document.put("Business Name", data.getName());
                             document.put("Rating", data.getRating());
@@ -111,6 +115,7 @@ public class ResultsActivity extends AppCompatActivity {
                             document.put("Phone Number", data.getPhoneNumber());
                             document.put("Latitude", data.getLat());
                             document.put("Longitude", data.getLong());
+                            //If saving to document is a success
                             docRef.set(document).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
@@ -122,17 +127,14 @@ public class ResultsActivity extends AppCompatActivity {
                                     Log.d("RESULT", "Document has not been saved");
                                 }
                             });
-                        } else {
+                        } else { //If user clicks button again to make it appear empty
                             star.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_heart));
-                            docRef.collection(ProfileActivity.email).document(businessName).delete()
+                            //Get business name document from email collection and delete document
+                            docRef.delete()
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            favoriteListUpdated = (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("favoriteList");
-
-                                            favoriteListUpdated.remove(FavoritesActivity.positionCount);
-                                            Log.e("positionCount", favoriteListUpdated + " successfully removed");
-                                            Log.e("positionCount", favoriteListUpdated.size() + " elements left");
+                                            Log.e("positionCount", data.getName() + " successfully removed");
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
@@ -149,6 +151,7 @@ public class ResultsActivity extends AppCompatActivity {
                     }
                 });
 
+                //Get document info, if it exists and user views results page again, make star appear filled
                 docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @SuppressLint("UseCompatLoadingForDrawables")
                     @Override
@@ -158,8 +161,10 @@ public class ResultsActivity extends AppCompatActivity {
                         }
                     }
                 });
-            } else star.setVisibility(View.GONE);
+            } else star.setVisibility(View.GONE); //If user is not signed in, remove favorites option
         } else {
+            //If user has not made a search and is attempting to view results page, then make all
+            //elements gone and display that no results have been searched
             name.setVisibility(View.GONE);
             rating.setVisibility(View.GONE);
             location.setVisibility(View.GONE);
@@ -169,6 +174,7 @@ public class ResultsActivity extends AppCompatActivity {
             map.setVisibility(View.GONE);
         }
 
+        //Bottom nav bar
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_results);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -176,10 +182,14 @@ public class ResultsActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.navigation_home:
+                        //If user is not signed in, jump to MainActivity
+                        //Reason for these conditions is originally, switching between search and main
+                        //will show a quick preview of profile activity before going to main activity.
+                        //These conditions eliminate that issue
                         if (MainActivity.signIn == 0) {
                             Intent home = new Intent(ResultsActivity.this, MainActivity.class);
                             startActivity(home);
-                        } else {
+                        } else { //If user signed in, jump to Profile Activity
                             Intent home = new Intent(ResultsActivity.this, ProfileActivity.class);
                             startActivity(home);
                         }
@@ -189,6 +199,7 @@ public class ResultsActivity extends AppCompatActivity {
                         startActivity(search);
                         break;
                     case R.id.navigation_favorites:
+                        //If user is signed out, alert is thrown if user goes to favorites page
                         if (MainActivity.signIn == 0) {
                             // Create the object of AlertDialog Builder class
                             AlertDialog.Builder builder = new AlertDialog.Builder(ResultsActivity.this);

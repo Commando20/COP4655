@@ -39,7 +39,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
     String name, email, idToken;
-    public static int signIn = 0;
+    public static int signIn = 0; //Public variable with only two values: 0 and 1
+    //Certain actions are restricted throughout the app if value is 0
 
     TextView signInTip;
     TextView welcome;
@@ -89,29 +90,33 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         signInButton = findViewById(R.id.signInButton);
 
+        //Upon clicking on sign in button
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Intent for getting Google Sign in API
                 Intent intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
                 startActivityForResult(intent,RC_SIGN_IN);
             }
         });
 
+        //Get bottom nav id so an item select listener can be set for switching between activites
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.navigation_search:
+                    case R.id.navigation_search: //If user goes to search page
                         Intent search = new Intent(MainActivity.this, SearchActivity.class);
                         startActivity(search);
                         break;
-                    case R.id.navigation_results:
+                    case R.id.navigation_results: //If user goes to results page
                         Intent results = new Intent(MainActivity.this, ResultsActivity.class);
                         startActivity(results);
                         break;
-                    case R.id.navigation_favorites:
+                    case R.id.navigation_favorites: //If user goes to favorites page
+                        //Going to favorites page while signed out gives alert when going to favorites page
                         // Create the object of AlertDialog Builder class
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                         // Set Alert Title
@@ -145,14 +150,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==RC_SIGN_IN){
+        if(requestCode==RC_SIGN_IN){ //If requestCode == to 1, get sign in info
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             assert result != null;
             handleSignInResult(result);
         }
     }
 
-    private void handleSignInResult(GoogleSignInResult result){
+    private void handleSignInResult(GoogleSignInResult result){ //Get info about user
         if(result.isSuccess()){
             GoogleSignInAccount account = result.getSignInAccount();
             assert account != null;
@@ -175,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
+                //If firebase log in successful, go to profile, else throw exception
                 Log.d("MainActivity", "signInWithCredential:onComplete:" + task.isSuccessful());
                 if (task.isSuccessful()) {
                     Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
@@ -189,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         });
     }
 
-    private void gotoProfile(){
+    private void gotoProfile(){ //After signing in, go to ProfileActivity from MainActivity
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

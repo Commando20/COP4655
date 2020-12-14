@@ -28,11 +28,11 @@ import java.util.Objects;
 
 public class FavoritesActivity extends AppCompatActivity {
 
+    //Make Variables global to give access to entire class
     YelpData data = SearchActivity.getDataInstance();
     ArrayList<HashMap<String, String>> favoriteList = new ArrayList<>();
     ListView lv;
     ListAdapter adapter;
-    public static int positionCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,14 +42,17 @@ public class FavoritesActivity extends AppCompatActivity {
 
         lv = findViewById(R.id.favoriteList);
 
+        //Make a query to fetch data from all businesses in database
         Task<QuerySnapshot> query = FirebaseFirestore.getInstance().collection(ProfileActivity.email).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        int count = 0;
+                        int count = 0; //Count used to log how many businesses user has favorited
                         if (task.isSuccessful()) {
+                            //Loop through collection and fetch every document in the user collection
                             for (DocumentSnapshot document : task.getResult()) {
-                                if (document.exists()) {
+                                if (document.exists()) { //Should the document exist in the collection
+                                    //Get string from title field and place into variable
                                     String name = document.getString("Business Name");
                                     String rating = document.getString("Rating");
                                     String address = document.getString("Location");
@@ -59,6 +62,7 @@ public class FavoritesActivity extends AppCompatActivity {
                                     String longitude = document.getString("Longitude");
 
                                     //Could also do Map<String, Object> myData = documentSnapshot.getData();
+                                    //Create a hash table to store fields of data for Arraylist
                                     HashMap<String, String> favBusinessList = new HashMap<>();
                                     favBusinessList.put("name", name);
                                     favBusinessList.put("location", address);
@@ -67,6 +71,7 @@ public class FavoritesActivity extends AppCompatActivity {
                                     favBusinessList.put("phoneNumber", phoneNumber);
                                     favBusinessList.put("latitude", latitude);
                                     favBusinessList.put("longitude", longitude);
+                                    //Add hash table into ArrayList
                                     favoriteList.add(favBusinessList);
                                 }
                                 ListAdapter adapter = new SimpleAdapter(FavoritesActivity.this, favoriteList,
@@ -75,12 +80,15 @@ public class FavoritesActivity extends AppCompatActivity {
                                 lv.setAdapter(adapter);
                                 count++;
 
+                                //Item click listener for when clicks an item on listView
                                 lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                     @SuppressLint("UseCompatLoadingForDrawables")
                                     @Override
                                     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                                         SearchActivity.searchConducted = 2;
+                                        //Create a hash table to fetch desired business data from ArrayList
                                         HashMap<String, String> business = favoriteList.get(position);
+                                        //Place values from ArrayList into set functions
                                         data.setName(business.get("name"));
                                         data.setRating(business.get("rating"));
                                         data.setAddress(business.get("location"));
@@ -89,10 +97,7 @@ public class FavoritesActivity extends AppCompatActivity {
                                         data.setLat(business.get("latitude"));
                                         data.setLong(business.get("longitude"));
 
-                                        positionCount = position;
-
                                         Intent intent = new Intent(FavoritesActivity.this, ResultsActivity.class);
-                                        intent.putExtra("favoriteList", favoriteList);
                                         Toast.makeText(FavoritesActivity.this, "Fetching data", Toast.LENGTH_SHORT).show();
                                         startActivity(intent);
                                     }

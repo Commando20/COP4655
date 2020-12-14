@@ -32,14 +32,14 @@ public class ProfileActivity extends AppCompatActivity implements GoogleApiClien
     TextView userName, userEmail, userId;
     ImageView profileImage;
     private GoogleApiClient googleApiClient;
-    public static String displayName, email;
+    public static String displayName, email; //Make username and email public for usage in other activites
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         Objects.requireNonNull(getSupportActionBar()).hide(); //Get rid of pesky titlebar
-        MainActivity.signIn = 1;
+        MainActivity.signIn = 1; //Make signIn = 1 so actions can be used in other activites
 
         signOutButton = findViewById(R.id.signOutButton);
         favoritesButton = findViewById(R.id.favoritesButton);
@@ -52,15 +52,18 @@ public class ProfileActivity extends AppCompatActivity implements GoogleApiClien
         googleApiClient=new GoogleApiClient.Builder(this).enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
 
+        //Click listener for when user taps to sign out
         signOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Set sign in back to 0 to restrict access to features for user
                 MainActivity.signIn = 0;
                 FirebaseAuth.getInstance().signOut();
                 Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
                         if (status.isSuccess()){
+                            //Go back to MainActivity (signed in page)
                             gotoMainActivity();
                         }else{
                             Toast.makeText(getApplicationContext(),"Session not close",Toast.LENGTH_LONG).show();
@@ -70,14 +73,17 @@ public class ProfileActivity extends AppCompatActivity implements GoogleApiClien
             }
         });
 
+        //Click listener for favorites button when user wants to view favorites
         favoritesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Create an intent and have user go to favorites from ProfileActivity
                 Intent favorites = new Intent(ProfileActivity.this, FavoritesActivity.class);
                 startActivity(favorites);
             }
         });
 
+        //Bottom nav bar
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -112,15 +118,18 @@ public class ProfileActivity extends AppCompatActivity implements GoogleApiClien
         }else{ opr.setResultCallback(this::handleSignInResult); }
     }
 
-    public void handleSignInResult(GoogleSignInResult result){
+    //Get user info and takes result of google sign in as parameter to get info
+    public void handleSignInResult(GoogleSignInResult result) {
         if(result.isSuccess()){
             GoogleSignInAccount account = result.getSignInAccount();
             assert account != null;
+            //Get user info
             displayName = account.getDisplayName();
             email = account.getEmail();
             userName.setText(displayName);
             userEmail.setText(email);
             try{
+                //Get photo URL and place into ImageView to see in app
                 Glide.with(this).load(account.getPhotoUrl()).into(profileImage);
             }catch (NullPointerException e){
                 Toast.makeText(getApplicationContext(),"image not found",Toast.LENGTH_LONG).show();
@@ -130,7 +139,7 @@ public class ProfileActivity extends AppCompatActivity implements GoogleApiClien
         }
     }
 
-    private void gotoMainActivity(){
+    private void gotoMainActivity() { //Go to Main Activity
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
