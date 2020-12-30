@@ -30,13 +30,13 @@ public class HistoryActivity extends AppCompatActivity {
                         Intent home = new Intent(HistoryActivity.this, MainActivity.class);
                         startActivity(home);
                         break;
-                    case R.id.navigation_search: //If user goes to search page
-                        Intent search = new Intent(HistoryActivity.this, SearchActivity.class);
-                        startActivity(search);
-                        break;
                     case R.id.navigation_results: //If user goes to results page
                         Intent results = new Intent(HistoryActivity.this, ResultsActivity.class);
                         startActivity(results);
+                        break;
+                    case R.id.navigation_map: //If user goes to search page
+                        Intent map = new Intent(HistoryActivity.this, MapActivity.class);
+                        startActivity(map);
                         break;
                 }
                 return true;

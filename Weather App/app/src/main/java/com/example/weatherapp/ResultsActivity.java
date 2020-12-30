@@ -3,11 +3,10 @@ package com.example.weatherapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import java.util.Objects;
 
 public class ResultsActivity extends AppCompatActivity {
 
@@ -15,7 +14,7 @@ public class ResultsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
-
+        Objects.requireNonNull(getSupportActionBar()).hide(); //Get rid of pesky titlebar
 
 
 
@@ -30,9 +29,9 @@ public class ResultsActivity extends AppCompatActivity {
                         Intent home = new Intent(ResultsActivity.this, MainActivity.class);
                         startActivity(home);
                         break;
-                    case R.id.navigation_search: //If user goes to search page
-                        Intent search = new Intent(ResultsActivity.this, SearchActivity.class);
-                        startActivity(search);
+                    case R.id.navigation_map: //If user goes to search page
+                        Intent map = new Intent(ResultsActivity.this, MapActivity.class);
+                        startActivity(map);
                         break;
                     case R.id.navigation_history: //If user goes to history page
                         Intent history = new Intent(ResultsActivity.this, HistoryActivity.class);
