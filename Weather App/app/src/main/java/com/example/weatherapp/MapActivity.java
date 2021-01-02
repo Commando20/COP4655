@@ -3,12 +3,8 @@ package com.example.weatherapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.EditText;
-import android.widget.ImageView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MapActivity extends AppCompatActivity {
@@ -17,7 +13,6 @@ public class MapActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-
 
         //Get bottom nav id so an item select listener can be set for switching between activites
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);

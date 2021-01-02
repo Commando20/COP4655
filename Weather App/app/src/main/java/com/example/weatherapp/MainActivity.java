@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -25,7 +26,6 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     public ImageView locationBtn;
     public ImageView speechBtn;
     public EditText inputLocation;
+    public ConstraintLayout layout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,14 +45,13 @@ public class MainActivity extends AppCompatActivity {
         searchBtn = findViewById(R.id.searchBtn);
         locationBtn = findViewById(R.id.locationBtn);
         speechBtn = findViewById(R.id.speechBtn);
+        layout = findViewById(R.id.layout);
 
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent results = new Intent(MainActivity.this, ResultsActivity.class);
-
                 getWeatherByLocation();
-
                 startActivity(results);
             }
         });
@@ -170,11 +170,14 @@ public class MainActivity extends AppCompatActivity {
                     int sunsetInt = Integer.parseInt(sunset);
 
                     if (unixTime > sunriseInt && unixTime < sunsetInt)
-                        Log.e("RESULT", "it is middle of day");
+                        Log.e("RESULT", "it is night before sunrise");
                     else if (unixTime < sunriseInt)
                         Log.e("RESULT", "it is night before sunrise");
-                    else if (unixTime > sunsetInt)
+                    else if (unixTime > sunsetInt) {
                         Log.e("RESULT", "it is night after sunset");
+                        //layout.setBackgroundResource(R.drawable.night);
+                        getWindow().getDecorView().setBackgroundResource(R.drawable.night);
+                    }
 
                     //Need to multiply by 1000L or else date will be in 1970
                     Date dateSunrise = new Date(Long.parseLong(sunrise) * 1000L);
@@ -190,9 +193,7 @@ public class MainActivity extends AppCompatActivity {
 
                     JSONObject coordObject = response.getJSONObject("coord");
                     String lon = coordObject.getString("lon");
-                    //longitudeValue = Double.parseDouble(lon);
                     String lat = coordObject.getString("lat");
-                    //latitudeValue = Double.parseDouble(lat);
                     data.setLatitude(lat);
                     data.setLongitude(lon);
 

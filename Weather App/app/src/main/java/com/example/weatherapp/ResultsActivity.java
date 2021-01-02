@@ -13,20 +13,11 @@ import java.util.Objects;
 
 public class ResultsActivity extends AppCompatActivity {
 
-    TextView location;
-    TextView description;
-    TextView temperature;
-    TextView tempMaxMin;
-    TextView wind;
-    TextView pressure;
-    TextView humidity;
-    TextView sunrise;
-    TextView sunset;
-    TextView coordinates;
+    TextView location, description, temperature, tempMaxMin,
+             wind, pressure, humidity, sunrise, sunset, coordinates;
 
     //Make data instance global to access from all classes and functions in activity
     WeatherData data = MainActivity.getDataInstance();
-
 
     @SuppressLint("SetTextI18n")
     @Override
