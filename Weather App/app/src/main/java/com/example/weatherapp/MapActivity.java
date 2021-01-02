@@ -7,12 +7,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.Objects;
+
 public class MapActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        Objects.requireNonNull(getSupportActionBar()).hide(); //Get rid of pesky titlebar
 
         //Get bottom nav id so an item select listener can be set for switching between activites
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);

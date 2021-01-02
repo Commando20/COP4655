@@ -26,6 +26,7 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Objects.requireNonNull(getSupportActionBar()).hide(); //Get rid of pesky titlebar
 
         inputLocation = findViewById(R.id.input);
         searchBtn = findViewById(R.id.searchBtn);
