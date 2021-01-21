@@ -8,6 +8,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -25,7 +29,9 @@ import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
     public ImageView speechBtn;
     public EditText inputLocation;
     public ConstraintLayout layout;
+
+    String location;
+    double latitude, longitude;
+    long unixTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent results = new Intent(MainActivity.this, ResultsActivity.class);
                 getWeatherByLocation();
+                getWeatherHistory(location, latitude, longitude, 1609465557);
+                Log.e("RESULT", "location is " + location);
+
                 startActivity(results);
             }
         });
@@ -110,9 +123,9 @@ public class MainActivity extends AppCompatActivity {
         //Change the API URL to have a parameter of either zip code or not
         //if the user's input is a number or not
         if (Utility.numberOrNot(input)){
-            URL = "https://api.openweathermap.org/data/2.5/weather?zip=" + input + "&appid=fef8540a70d2ee7ba4534ac73d4bd84b";
+            URL = "https://api.openweathermap.org/data/2.5/weather?zip=" + input + "&appid=YOUR_API_KEY&units=imperial";
         } else {
-            URL = "https://api.openweathermap.org/data/2.5/weather?q=" + input + "&appid=fef8540a70d2ee7ba4534ac73d4bd84b";
+            URL = "https://api.openweathermap.org/data/2.5/weather?q=" + input + "&appid=YOUR_API_KEY&units=imperial";
         }
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL, new Response.Listener<JSONObject>() {
@@ -123,8 +136,9 @@ public class MainActivity extends AppCompatActivity {
                     Intent text = new Intent(MainActivity.this, ResultsActivity.class);
 
                     //Retrieves string from the response JSON Object and converts them into JSON object
-                    String location = response.getString("name");
+                    location = response.getString("name");
                     data.setName(location);
+                    Log.e("RESULT", "location is " + location);
 
                     JSONObject mainObject = response.getJSONObject("main");
 
@@ -136,27 +150,18 @@ public class MainActivity extends AppCompatActivity {
 
                     String temperature = mainObject.getString("temp");
                     double temp = Double.parseDouble(temperature);
-                    double fahrenheit_double = ((temp - 273.15) * 9 / 5) + 32;
-                    int fahrenheit = (int) fahrenheit_double;
-                    data.setTemperature(String.valueOf(fahrenheit));
+                    data.setTemperature(String.valueOf(Math.round(temp)));
 
                     String temp_max = mainObject.getString("temp_max");
-                    double max = Double.parseDouble(temp_max);
-                    double max_conversion = ((max - 273.15) * 1.8) + 32;
-                    int max_temp = (int) max_conversion;
-
+                    double max_temp = Double.parseDouble(temp_max);
                     String temp_min = mainObject.getString("temp_min");
-                    double min = Double.parseDouble(temp_min);
-                    double min_conversion = ((min - 273.15) * 1.8) + 32;
-                    int min_temp = (int) min_conversion;
-                    String temp_maxmin = max_temp + "\u00B0 F / " + min_temp + "\u00B0 F";
+                    double min_temp = Double.parseDouble(temp_min);
+                    String temp_maxmin = Math.round(max_temp) + "\u00B0 F / " + Math.round(min_temp) + "\u00B0 F";
                     data.setTempMaxMin(temp_maxmin);
 
                     JSONObject windObject = response.getJSONObject("wind");
                     String wind = windObject.getString("speed");
-                    double windMS = Double.parseDouble(wind);
-                    double windMPH = windMS * 2.23694;
-                    data.setWind(String.format("%.2f", windMPH));
+                    data.setWind(wind);
 
                     String pressure = mainObject.getString("pressure");
                     data.setPressure(pressure);
@@ -194,8 +199,10 @@ public class MainActivity extends AppCompatActivity {
                     data.setSunset(formattedSunset);
 
                     JSONObject coordObject = response.getJSONObject("coord");
-                    String lon = coordObject.getString("lon");
                     String lat = coordObject.getString("lat");
+                    latitude = Double.parseDouble(lat);
+                    String lon = coordObject.getString("lon");
+                    longitude = Double.parseDouble(lon);
                     data.setLatitude(lat);
                     data.setLongitude(lon);
 
@@ -207,6 +214,60 @@ public class MainActivity extends AppCompatActivity {
         },
         // The final parameter overrides the method onErrorResponse() and passes VolleyError
         //as a parameter
+        new Response.ErrorListener() {
+            @Override
+            //Handles errors that occur due to Volley
+            public void onErrorResponse(VolleyError error) {
+                Log.e("Volley", String.valueOf(error));
+            }
+        });
+        queue.add(request);
+    }
+
+    public void getWeatherHistory(final String location, double latitude, double longitude, long time) {
+        //Make an ArrayList for storing values for weather history
+        final ArrayList<HashMap<String, String>> list = new ArrayList<>();
+        final ListView lv = findViewById(R.id.list);
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+
+        String URL = "https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=" + latitude + "&lon="
+                + longitude + "&dt=" + time + "&appid=YOUR_API_KEY&units=imperial";
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    //Retrieves string from the response JSON Object and converts them into JSON object
+                    JSONObject currentObject = response.getJSONObject("current");
+                    String temperature = currentObject.getString("temp");
+
+                    JSONArray weatherArray = response.getJSONArray("weather");
+                    JSONObject weatherObject = weatherArray.getJSONObject(0);
+                    String description = weatherObject.getString("description");
+                    String capitalize = description.substring(0, 1).toUpperCase() + description.substring(1);
+
+                    //Create a new hash table to put values from weather history into
+                    HashMap<String, String> weatherList = new HashMap<>();
+                    weatherList.put("location", location);
+                    weatherList.put("description", capitalize);
+                    weatherList.put("temperature", temperature);
+                    //Add hash table into ArrayList
+                    list.add(weatherList);
+
+                    //Create an adapter for ArrayList with only name and location for listView
+                    ListAdapter adapter = new SimpleAdapter(MainActivity.this, list,
+                            R.layout.list_item, new String[]{"location", "description", "temperature"},
+                            new int[]{R.id.location, R.id.description, R.id.temperature});
+                    lv.setAdapter(adapter);
+
+                    Log.e("RESULT", location);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        },
+        // The final parameter overrides the method onErrorResponse() and passes VolleyError as parameter
         new Response.ErrorListener() {
             @Override
             //Handles errors that occur due to Volley

@@ -3,6 +3,9 @@ package com.example.weatherapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +21,7 @@ public class HistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
         Objects.requireNonNull(getSupportActionBar()).hide(); //Get rid of pesky titlebar
+
 
         //Get bottom nav id so an item select listener can be set for switching between activites
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
