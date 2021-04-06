@@ -10,8 +10,8 @@ public class WeatherData {
     private String humidity;
     private String sunrise;
     private String sunset;
-    private String latitude;
-    private String longitude;
+    private double latitude;
+    private double longitude;
 
     public WeatherData() {}
 
@@ -33,9 +33,9 @@ public class WeatherData {
 
     public void setSunset(String weatherSunset) { this.sunset = weatherSunset; }
 
-    public void setLatitude(String weatherLatitude) { this.latitude = weatherLatitude; }
+    public void setLatitude(double weatherLatitude) { this.latitude = weatherLatitude; }
 
-    public void setLongitude(String weatherLongitude) { this.longitude = weatherLongitude; }
+    public void setLongitude(double weatherLongitude) { this.longitude = weatherLongitude; }
 
     public String getName() { return this.name; }
 
@@ -55,7 +55,7 @@ public class WeatherData {
 
     public String getSunset() { return this.sunset; }
 
-    public String getLatitude() { return this.latitude; }
+    public double getLatitude() { return this.latitude; }
 
-    public String getLongitude() { return this.longitude; }
+    public double getLongitude() { return this.longitude; }
 }

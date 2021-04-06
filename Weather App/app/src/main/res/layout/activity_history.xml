@@ -7,7 +7,7 @@
     tools:context=".MainActivity" >
 
     <ListView
-        android:id="@+id/list"
+        android:id="@+id/listhistory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:divider="#C1C1C1"

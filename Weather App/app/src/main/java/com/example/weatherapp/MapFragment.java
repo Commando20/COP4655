@@ -27,8 +27,8 @@ public class MapFragment extends Fragment {
             WeatherData data = MainActivity.getDataInstance(); //Get Yelp data instance
 
             //Get lat and long data from business and place into variables
-            double latitude = Double.parseDouble(data.getLatitude());
-            double longitude = Double.parseDouble(data.getLongitude());
+            double latitude = data.getLatitude();
+            double longitude = data.getLongitude();
             //Make a new LatLnhg location based on business coords
             LatLng location = new LatLng(latitude, longitude);
 

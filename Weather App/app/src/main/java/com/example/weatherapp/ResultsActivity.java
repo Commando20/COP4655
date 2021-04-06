@@ -3,21 +3,39 @@ package com.example.weatherapp;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
 public class ResultsActivity extends AppCompatActivity {
 
-    TextView location, description, temperature, tempMaxMin,
-             wind, pressure, humidity, sunrise, sunset, coordinates;
-
     //Make data instance global to access from all classes and functions in activity
     WeatherData data = MainActivity.getDataInstance();
+
+    TextView location, description, temperature, tempMaxMin, wind, pressure, humidity, sunrise,
+             sunset, coordinates;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -46,8 +64,8 @@ public class ResultsActivity extends AppCompatActivity {
         humidity.setText("Humidity: " + data.getHumidity() + "%");
         sunrise.setText("Sunrise: " + data.getSunrise() + " AM");
         sunset.setText("Sunset: " + data.getSunset() + " PM");
-        coordinates.setText("Coordinates: " + data.getLatitude() + "\u00B0 , "
-                            + data.getLongitude() + "\u00B0");
+        coordinates.setText("Coordinates: " + data.getLatitude() + "\u00B0 , " + data.getLongitude()
+                            + "\u00B0");
 
         //Get bottom nav id so an item select listener can be set for switching between activites
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -73,4 +91,5 @@ public class ResultsActivity extends AppCompatActivity {
             }
         });
     }
+
 }
