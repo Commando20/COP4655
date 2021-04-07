@@ -141,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 // Create the object of AlertDialog Builder class
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-
                 switch (item.getItemId()) {
                     case R.id.navigation_results: //If user goes to results page
                         Intent results = new Intent(MainActivity.this, ResultsActivity.class);

@@ -35,7 +35,7 @@ public class MapFragment extends Fragment {
             //Add a marker and place camera at business location on map
             googleMap.addMarker(new MarkerOptions().position(location).title(data.getName()));
             googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-            googleMap.moveCamera(CameraUpdateFactory.zoomTo(12));
+            googleMap.moveCamera(CameraUpdateFactory.zoomTo(15));
         }
     };
 
