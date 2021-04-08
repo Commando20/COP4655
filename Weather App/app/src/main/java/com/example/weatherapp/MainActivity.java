@@ -2,20 +2,22 @@ package com.example.weatherapp;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 
 import com.android.volley.Request;
@@ -32,10 +34,13 @@ import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
+    private final int REQ_CODE = 100;
 
     //Location-based services
     private static final int REQUEST_CODE_PERMISSION = 2;
@@ -43,15 +48,14 @@ public class MainActivity extends AppCompatActivity {
     GPSTracker gps;
 
     public static WeatherData data = new WeatherData();
-    public ImageView searchBtn;
-    public ImageView locationBtn;
-    public ImageView speechBtn;
-    public EditText inputLocation;
-    public ConstraintLayout layout;
+    Button searchBtn;
+    Button locationBtn;
+    Button speechBtn;
+    EditText inputLocation;
 
     String location;
     double latitude, longitude;
-    long unixTime = System.currentTimeMillis() / 1000;
+    public static String sunrise, sunset;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) { //Once application starts
@@ -70,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
         searchBtn = findViewById(R.id.searchBtn);
         locationBtn = findViewById(R.id.locationBtn);
         speechBtn = findViewById(R.id.speechBtn);
-        layout = findViewById(R.id.layout);
 
         //If search button is clicked, collect weather data based on input
         searchBtn.setOnClickListener(new View.OnClickListener() {
@@ -128,6 +131,16 @@ public class MainActivity extends AppCompatActivity {
         speechBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Need to speak");
+                try {
+                    startActivityForResult(intent, REQ_CODE);
+                } catch (ActivityNotFoundException a) {
+                    Toast.makeText(getApplicationContext(), "Sorry your device is not supported", Toast.LENGTH_SHORT).show();
+                }
+
                 Intent results = new Intent(MainActivity.this, ResultsActivity.class);
                 startActivity(results);
             }
@@ -216,13 +229,12 @@ public class MainActivity extends AppCompatActivity {
         //Change the API URL to have a parameter of either zip code or not
         //if the user's input is a number or not
         if (Utility.numberOrNot(input)){
-            URL = "https://api.openweathermap.org/data/2.5/weather?zip=" + input + "&appid=fef8540a70d2ee7ba4534ac73d4bd84b&units=imperial";
+            URL = "https://api.openweathermap.org/data/2.5/weather?zip=" + input + "&appid=API_KEY&units=imperial";
         } else {
-            URL = "https://api.openweathermap.org/data/2.5/weather?q=" + input + "&appid=fef8540a70d2ee7ba4534ac73d4bd84b&units=imperial";
+            URL = "https://api.openweathermap.org/data/2.5/weather?q=" + input + "&appid=API_KEY&units=imperial";
         }
 
         Log.e("RESULT", "url " + URL);
-
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL, new Response.Listener<JSONObject>() {
             @SuppressLint({"SimpleDateFormat", "DefaultLocale"})
             @Override
@@ -246,11 +258,11 @@ public class MainActivity extends AppCompatActivity {
                     data.setTemperature(String.valueOf(Math.round(temp)));
 
                     String temp_max = mainObject.getString("temp_max");
-                    double max_temp = Double.parseDouble(temp_max);
+                    double tempMax = Double.parseDouble(temp_max);
                     String temp_min = mainObject.getString("temp_min");
-                    double min_temp = Double.parseDouble(temp_min);
-                    String temp_maxmin = Math.round(max_temp) + "\u00B0 F / " + Math.round(min_temp) + "\u00B0 F";
-                    data.setTempMaxMin(temp_maxmin);
+                    double tempMin = Double.parseDouble(temp_min);
+                    data.setTempMax(String.valueOf(Math.round(tempMax)));
+                    data.setTempMin(String.valueOf(Math.round(tempMin)));
 
                     JSONObject windObject = response.getJSONObject("wind");
                     String wind = windObject.getString("speed");
@@ -263,20 +275,8 @@ public class MainActivity extends AppCompatActivity {
                     data.setHumidity(humidity);
 
                     JSONObject sysObject = response.getJSONObject("sys");
-                    String sunrise = sysObject.getString("sunrise");
-                    String sunset = sysObject.getString("sunset");
-                    int sunriseInt = Integer.parseInt(sunrise);
-                    int sunsetInt = Integer.parseInt(sunset);
-
-                    if (unixTime > sunriseInt && unixTime < sunsetInt)
-                        Log.e("RESULT", "it is night before sunrise");
-                    else if (unixTime < sunriseInt)
-                        Log.e("RESULT", "it is night before sunrise");
-                    else if (unixTime > sunsetInt) {
-                        Log.e("RESULT", "it is night after sunset");
-                        //layout.setBackgroundResource(R.drawable.night);
-                        getWindow().getDecorView().setBackgroundResource(R.drawable.night);
-                    }
+                    sunrise = sysObject.getString("sunrise");
+                    sunset = sysObject.getString("sunset");
 
                     //Need to multiply by 1000L or else date will be in 1970
                     Date dateSunrise = new Date(Long.parseLong(sunrise) * 1000L);
@@ -320,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
     public void getWeatherByGPS() {
         if(gps.canGetLocation()) {
             RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-            String URL = "https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=fef8540a70d2ee7ba4534ac73d4bd84b&units=imperial";
+            String URL = "https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=API_KEY&units=imperial";
             Log.e("RESULT", "url " + URL);
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL, new Response.Listener<JSONObject>() {
                 @SuppressLint({"SimpleDateFormat", "DefaultLocale"})
@@ -345,11 +345,11 @@ public class MainActivity extends AppCompatActivity {
                         data.setTemperature(String.valueOf(Math.round(temp)));
 
                         String temp_max = mainObject.getString("temp_max");
-                        double max_temp = Double.parseDouble(temp_max);
+                        double tempMax = Double.parseDouble(temp_max);
                         String temp_min = mainObject.getString("temp_min");
-                        double min_temp = Double.parseDouble(temp_min);
-                        String temp_maxmin = Math.round(max_temp) + "\u00B0 F / " + Math.round(min_temp) + "\u00B0 F";
-                        data.setTempMaxMin(temp_maxmin);
+                        double tempMin = Double.parseDouble(temp_min);
+                        data.setTempMax(String.valueOf(Math.round(tempMax)));
+                        data.setTempMin(String.valueOf(Math.round(tempMin)));
 
                         JSONObject windObject = response.getJSONObject("wind");
                         String wind = windObject.getString("speed");
@@ -362,20 +362,8 @@ public class MainActivity extends AppCompatActivity {
                         data.setHumidity(humidity);
 
                         JSONObject sysObject = response.getJSONObject("sys");
-                        String sunrise = sysObject.getString("sunrise");
-                        String sunset = sysObject.getString("sunset");
-                        int sunriseInt = Integer.parseInt(sunrise);
-                        int sunsetInt = Integer.parseInt(sunset);
-
-                        if (unixTime > sunriseInt && unixTime < sunsetInt)
-                            Log.e("RESULT", "it is night before sunrise");
-                        else if (unixTime < sunriseInt)
-                            Log.e("RESULT", "it is night before sunrise");
-                        else if (unixTime > sunsetInt) {
-                            Log.e("RESULT", "it is night after sunset");
-                            //layout.setBackgroundResource(R.drawable.night);
-                            getWindow().getDecorView().setBackgroundResource(R.drawable.night);
-                        }
+                        sunrise = sysObject.getString("sunrise");
+                        sunset = sysObject.getString("sunset");
 
                         //Need to multiply by 1000L or else date will be in 1970
                         Date dateSunrise = new Date(Long.parseLong(sunrise) * 1000L);
@@ -417,6 +405,20 @@ public class MainActivity extends AppCompatActivity {
         }else {
             // can't get location, GPS or Network is not enabled, Ask user to enable GPS/network in settings
             gps.showSettingsAlert();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQ_CODE) {
+            if (resultCode == RESULT_OK && null != data) {
+                //ArrayList result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                //assert result != null;
+                //Log.e("RESULT", String.valueOf(result.get(0)));
+
+                //inputLocation.setText((Integer) result.get(0));
+            }
         }
     }
 }

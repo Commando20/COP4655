@@ -1,15 +1,19 @@
 package com.example.weatherapp;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -33,11 +37,15 @@ public class HistoryActivity extends AppCompatActivity {
     WeatherData data = MainActivity.getDataInstance();
 
     ListView lv;
+    ConstraintLayout layout;
 
     String location = data.getName();
     double latitude = data.getLatitude();
     double longitude = data.getLongitude();
+
     long unixTimeInMillis = System.currentTimeMillis();
+    long unixTime = System.currentTimeMillis() / 1000;
+
     int dayCounter = 1;
     String day;
 
@@ -50,17 +58,38 @@ public class HistoryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_history);
         Objects.requireNonNull(getSupportActionBar()).hide(); //Get rid of pesky titlebar
 
+        layout = findViewById(R.id.layoutHistory);
         lv = findViewById(R.id.list);
 
-        Log.e("RESULT", "Unix time is: " + (unixTimeInMillis / 1000));
+        String sunrise = MainActivity.sunrise;
+        String sunset = MainActivity.sunset;
+        int sunriseInt = Integer.parseInt(sunrise);
+        int sunsetInt = Integer.parseInt(sunset);
+
+        Log.e("RESULT", String.valueOf(unixTime));
+
+        //If current time is after sunrise but before sunset
+        if (unixTime > sunriseInt && unixTime < sunsetInt) {
+            layout.setBackground(ContextCompat.getDrawable(this, R.drawable.daytime));
+        }
+        //If the current time is before sunrise
+        else if (unixTime < sunriseInt) {
+            layout.setBackground(ContextCompat.getDrawable(this, R.drawable.night));
+        }
+        //If the current time is at sunset and the current time is less than sunset time plus an hour
+        else if (unixTime == sunsetInt && unixTime < (sunsetInt + 3600)) {
+            layout.setBackground(ContextCompat.getDrawable(this, R.drawable.sunset));
+        }
+        //If the current time is past sunset (nighttime)
+        else if (unixTime > sunsetInt) {
+            layout.setBackground(ContextCompat.getDrawable(this, R.drawable.night));
+        }
 
         //Get weather history from past 5 days
         //86400000 milliseconds is equal to 1 day
-        long i = unixTimeInMillis - 86400000;
         //loop and decrement a day from time (max decrement of 5 days due to API restrictions)
-        while ( i > unixTimeInMillis - (86400000 * 6) ) {
+        for(long i = unixTimeInMillis - 86400000; i > unixTimeInMillis - (86400000 * 6); i = i - 86400000) {
             getWeatherHistory(location, latitude, longitude, i / 1000);
-            i = i - 86400000;
         }
 
         //Get bottom nav id so an item select listener can be set for switching between activites
@@ -91,8 +120,8 @@ public class HistoryActivity extends AppCompatActivity {
     public void getWeatherHistory(final String location, double latitude, double longitude, long time) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String URL = "https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=" + latitude + "&lon="
-                + longitude + "&dt=" + time + "&appid=fef8540a70d2ee7ba4534ac73d4bd84b&units=imperial";
-        Log.e("RESULT", URL);
+                + longitude + "&dt=" + time + "&appid=API_KEY&units=imperial";
+        //Log.e("RESULT", URL);
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -114,7 +143,7 @@ public class HistoryActivity extends AppCompatActivity {
                    // Log.e("RESULT", "Description of weather is: " + capitalizeDescription);
                     Log.e("RESULT", "-----------------------------------------------------------");
                     if (dayCounter == 1) {
-                        day = "yesterday";
+                        day = "Yesterday";
                     } else day = dayCounter + " days ago";
 
                     //Create a new hash table to put values from weather history into

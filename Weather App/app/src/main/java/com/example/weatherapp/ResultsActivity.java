@@ -2,31 +2,22 @@ package com.example.weatherapp;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Objects;
 
 public class ResultsActivity extends AppCompatActivity {
@@ -34,8 +25,12 @@ public class ResultsActivity extends AppCompatActivity {
     //Make data instance global to access from all classes and functions in activity
     WeatherData data = MainActivity.getDataInstance();
 
-    TextView location, description, temperature, tempMaxMin, wind, pressure, humidity, sunrise,
-             sunset, coordinates;
+    TextView location, description, temperature, tempMax, tempMin, wind, pressure, humidity, sunrise, sunset, date;
+    ImageView upArrow;
+    ImageView downArrow;
+    ConstraintLayout layout;
+
+    long unixTime = System.currentTimeMillis() / 1000;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -44,28 +39,77 @@ public class ResultsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_results);
         Objects.requireNonNull(getSupportActionBar()).hide(); //Get rid of pesky titlebar
 
+        layout = findViewById(R.id.layout);
+
+        date = findViewById(R.id.date);
+        Calendar calendar = Calendar.getInstance();
+
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy");
+        String dateTime = dateFormat.format(calendar.getTime());
+        date.setText(dateTime);
+
         location = findViewById(R.id.location);
         description = findViewById(R.id.description);
         temperature = findViewById(R.id.temperature);
-        tempMaxMin = findViewById(R.id.MaxMin);
+        upArrow = findViewById(R.id.upArrow);
+        downArrow = findViewById(R.id.downArrow);
+        tempMax = findViewById(R.id.Max);
+        tempMin = findViewById(R.id.Min);
         wind = findViewById(R.id.wind);
         pressure = findViewById(R.id.pressure);
         humidity = findViewById(R.id.humidity);
         sunrise = findViewById(R.id.sunrise);
         sunset = findViewById(R.id.sunset);
-        coordinates = findViewById(R.id.coordinates);
 
         location.setText(data.getName());
         description.setText(data.getDescription());
+
         temperature.setText(data.getTemperature() + "\u00B0 F");
-        tempMaxMin.setText(data.getTempMaxMin());
+        tempMax.setText(data.getTempMax() + "\u00B0 F");
+        tempMin.setText(data.getTempMin()  + "\u00B0 F");
         wind.setText("Wind: " + data.getWind() + " mph");
         pressure.setText("Pressure: " + data.getPressure() + " hPa");
         humidity.setText("Humidity: " + data.getHumidity() + "%");
         sunrise.setText("Sunrise: " + data.getSunrise() + " AM");
         sunset.setText("Sunset: " + data.getSunset() + " PM");
-        coordinates.setText("Coordinates: " + data.getLatitude() + "\u00B0 , " + data.getLongitude()
-                            + "\u00B0");
+
+        String sunrise = MainActivity.sunrise;
+        String sunset = MainActivity.sunset;
+
+        int sunriseInt = Integer.parseInt(sunrise);
+        int sunsetInt = Integer.parseInt(sunset);
+
+        Log.e("RESULT", String.valueOf(unixTime));
+
+        //If current time is after sunrise but before sunset
+        if (unixTime > sunriseInt && unixTime < sunsetInt) {
+            layout.setBackground(ContextCompat.getDrawable(this, R.drawable.daytime));
+        }
+        //If the current time is before sunrise
+        else if (unixTime < sunriseInt) {
+            makeWhite();
+            //make up and down arrows white
+            upArrow.setImageResource(R.drawable.up_arrow);
+            downArrow.setImageResource(R.drawable.down_arrow);
+            layout.setBackground(ContextCompat.getDrawable(this, R.drawable.night));
+        }
+        //If the current time is at sunset and the current time is less than sunset time plus an hour
+        else if (unixTime == sunsetInt && unixTime < (sunsetInt + 3600)) {
+            makeWhite();
+            //make up and down arrows white
+            upArrow.setImageResource(R.drawable.up_arrow);
+            downArrow.setImageResource(R.drawable.down_arrow);
+            layout.setBackground(ContextCompat.getDrawable(this, R.drawable.sunset));
+        }
+        //If the current time is past sunset (nighttime)
+        else if (unixTime > sunsetInt) {
+            makeWhite();
+            //make up and down arrows white
+            upArrow.setImageResource(R.drawable.up_arrow);
+            downArrow.setImageResource(R.drawable.down_arrow);
+            layout.setBackground(ContextCompat.getDrawable(this, R.drawable.night));
+        }
 
         //Get bottom nav id so an item select listener can be set for switching between activites
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -92,4 +136,17 @@ public class ResultsActivity extends AppCompatActivity {
         });
     }
 
+    public void makeWhite() {
+        date.setTextColor(Color.parseColor("#FFFFFF"));
+        location.setTextColor(Color.parseColor("#FFFFFF"));
+        description.setTextColor(Color.parseColor("#FFFFFF"));
+        temperature.setTextColor(Color.parseColor("#FFFFFF"));
+        tempMax.setTextColor(Color.parseColor("#FFFFFF"));
+        tempMin.setTextColor(Color.parseColor("#FFFFFF"));
+        wind.setTextColor(Color.parseColor("#FFFFFF"));
+        pressure.setTextColor(Color.parseColor("#FFFFFF"));
+        humidity.setTextColor(Color.parseColor("#FFFFFF"));
+        sunrise.setTextColor(Color.parseColor("#FFFFFF"));
+        sunset.setTextColor(Color.parseColor("#FFFFFF"));
+    }
 }

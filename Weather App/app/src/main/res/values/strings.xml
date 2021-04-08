@@ -1,4 +1,4 @@
 <resources>
-    <string name="google_maps_key" templateMergeStrategy="preserve">AIzaSyAdCrrOAe_R8oFhuCqMOU3xR99VhzNWUcQ</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve">API_KEY</string>
     <string name="app_name">Weather App</string>
 </resources>

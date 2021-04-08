@@ -4,7 +4,8 @@ public class WeatherData {
     private String name;
     private String description;
     private String temperature;
-    private String tempMaxMin;
+    private String tempMax;
+    private String tempMin;
     private String wind;
     private String pressure;
     private String humidity;
@@ -21,7 +22,9 @@ public class WeatherData {
 
     public void setTemperature(String weatherTemperature) { this.temperature = weatherTemperature; }
 
-    public void setTempMaxMin(String weatherTempMaxMin) { this.tempMaxMin = weatherTempMaxMin; }
+    public void setTempMax(String weatherTempMax) { this.tempMax = weatherTempMax; }
+
+    public void setTempMin(String weatherTempMin) { this.tempMin = weatherTempMin; }
 
     public void setWind(String weatherWind) { this.wind = weatherWind; }
 
@@ -43,7 +46,9 @@ public class WeatherData {
 
     public String getTemperature() { return this.temperature; }
 
-    public String getTempMaxMin() { return this.tempMaxMin; }
+    public String getTempMax() { return this.tempMax; }
+
+    public String getTempMin() { return this.tempMin; }
 
     public String getWind() { return this.wind; }
 
