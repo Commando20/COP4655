@@ -5,6 +5,7 @@
 
 <img src="https://github.com/Commando20/Android-App-Development/blob/Weather-App/Weather%20App/screenshots/HomeScreen.JPG" width="200" height="400" align="left"/>
 <img src="https://github.com/Commando20/Android-App-Development/blob/Weather-App/Weather%20App/screenshots/searchByCity.JPG" width="200" height="400" align="left"/>
+<br>
 <img src="https://github.com/Commando20/Android-App-Development/blob/Weather-App/Weather%20App/screenshots/searchByCityMap.JPG" width="200" height="400" align="left"/>
 <img src="https://github.com/Commando20/Android-App-Development/blob/Weather-App/Weather%20App/screenshots/weatherHistory.JPG" width="200" height="400" align="left"/>
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
