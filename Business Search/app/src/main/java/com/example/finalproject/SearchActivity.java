@@ -397,7 +397,7 @@ public class SearchActivity extends AppCompatActivity {
             public Map<String,String> getHeaders() {
                 Map<String,String> params = new HashMap<>();
                 //Create hash table with bearer token in order to have access to use Yelp API
-                params.put("Authorization","bearer " + "IGeH9oQlcaQpbdrzxIUBCDfC6zgIC4dkRt2_LEE2W99GHrW5JKl91db_nWarHKP9RgpzfouaXn8IW3q8HEwF_o3V6tIzgghXQCWnKq5MGurm9vC7ZaJWkXD5yYyyX3Yx");
+                params.put("Authorization","bearer " + "YOUR BEARER TOKEN");
                 return params;
             }
         };
